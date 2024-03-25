@@ -9,5 +9,11 @@
       "all_frames": true,
       "js": ["content-script.js"]
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["images/download.svg"],
+      "matches": ["https://*.box.com/*"]
+    }
   ]
 }
