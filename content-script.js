@@ -23,16 +23,10 @@ const appendSeparator = () => {
 appendSeparator();
 
 {
-    appendSeparator();
-    const li = document.createElement('li');
-    menuElem.appendChild(li);
-
     const button = document.createElement('button');
-    button.textContent = 'B';
     button.title = 'Download body';
     button.addEventListener('click', async () => {
         const contentElem = document.querySelector('.content-container');
-        // console.log('contentElem', contentElem);
         let text = "";
 
         const listBuilder = (subElem, level) => {
@@ -131,5 +125,18 @@ appendSeparator();
         downloadText(text, titleText);
     });
 
+    const img = document.createElement('img');
+    img.src = chrome.runtime.getURL('images/download.svg');
+    img.style = 'width: 80%; height: 80%;'
+
+    const span = document.createElement('span');
+    span.classList.add('buttonicon');
+    span.classList.add('buttonicon-svg');
+
+    const li = document.createElement('li');
+
+    span.appendChild(img);
+    button.appendChild(span);
     li.appendChild(button);
+    menuElem.appendChild(li);
 }
