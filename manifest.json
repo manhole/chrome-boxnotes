@@ -1,0 +1,13 @@
+{
+  "name": "Box Notes Extension",
+  "version": "0.1.0",
+  "description": "Box Notes utilities",
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "matches": ["https://notes.services.box.com/p/note?*"],
+      "all_frames": true,
+      "js": ["content-script.js"]
+    }
+  ]
+}
