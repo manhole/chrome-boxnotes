@@ -20,34 +20,7 @@ const appendSeparator = () => {
     menuElem.appendChild(separator);
 };
 
-{
-    appendSeparator();
-    const li = document.createElement('li');
-    menuElem.appendChild(li);
-
-    const button = document.createElement('button');
-    button.textContent = 'TC';
-    button.title = 'Copy TOC';
-    button.addEventListener('click', async () => {
-        const items = document.querySelectorAll('.table-of-contents-list ol > li');
-        let text = "";
-        for (const item of items) {
-            text += item.textContent;
-            text += '\n';
-        }
-        // iframeでallowされていないので、コピーできない。
-        //await navigator.clipboard.writeText(text);
-        //console.log(text);
-
-        if (0 < text.length) {
-            const title = document.querySelector('.document-title');
-            const titleText = title.textContent + '-toc.md';
-            downloadText(text, titleText);
-        }
-    });
-
-    li.appendChild(button);
-}
+appendSeparator();
 
 {
     appendSeparator();
