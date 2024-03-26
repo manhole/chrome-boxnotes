@@ -41,6 +41,13 @@ appendSeparator();
                             text += '  ';
                         }
                         text += '- ';
+                        if (child.classList.contains('check-list-item')) {
+                            if (child.classList.contains('is-checked')) {
+                                text += '[x] ';
+                            } else {
+                                text += '[ ] ';
+                            }
+                        }
                         text += child.textContent;
                         text += '\n';
                         break;
