@@ -27,6 +27,26 @@ appendSeparator();
     button.title = 'Download body';
     button.addEventListener('click', async () => {
         const contentElem = document.querySelector('.content-container');
+        const textContentBuilder = (node) => {
+            switch (node.nodeType) {
+                case Node.ELEMENT_NODE: {
+                    // コラボレーターの名称がテキストに出力されないようにする
+                    if (node.tagName === 'DIV' && node.classList.contains('collab-cursor-container')) {
+                        return "";
+                    }
+                    let text = "";
+                    for (const child of node.childNodes) {
+                        text += textContentBuilder(child);
+                    }
+                    return text;
+                }
+                case Node.TEXT_NODE: {
+                    return node.textContent;
+                }
+            }
+            return "";
+        };
+
         let text = "";
 
         const listBuilder = (subElem, level) => {
@@ -48,7 +68,7 @@ appendSeparator();
                                 text += '[ ] ';
                             }
                         }
-                        text += child.textContent;
+                        text += textContentBuilder(child);
                         text += '\n';
                         break;
                     }
@@ -61,22 +81,22 @@ appendSeparator();
             for (const elem of parentElem.children) {
                 switch (elem.tagName) {
                     case 'P': {
-                        text += prefix + elem.textContent;
+                        text += prefix + textContentBuilder(elem);
                         text += '\n';
                         break;
                     }
                     case 'H1': {
-                        text += '# ' + elem.textContent;
+                        text += '# ' + textContentBuilder(elem);
                         text += '\n';
                         break;
                     }
                     case 'H2': {
-                        text += '## ' + elem.textContent;
+                        text += '## ' + textContentBuilder(elem);
                         text += '\n';
                         break;
                     }
                     case 'H3': {
-                        text += '### ' + elem.textContent;
+                        text += '### ' + textContentBuilder(elem);
                         text += '\n';
                         break;
                     }
@@ -91,7 +111,7 @@ appendSeparator();
                     case 'DIV': {
                         // コードブロックの1行
                         if (elem.classList.contains('cm-line')) {
-                            text += elem.textContent;
+                            text += textContentBuilder(elem);
                             text += '\n';
                             break;
                         }
