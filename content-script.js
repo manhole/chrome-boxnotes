@@ -33,6 +33,15 @@ appendSeparator();
                     if (node.tagName === 'DIV' && node.classList.contains('collab-cursor-container')) {
                         return "";
                     }
+                    if (node.tagName === 'STRONG') {
+                        let text = '**';
+                        for (const child of node.childNodes) {
+                            text += textContentBuilder(child);
+                        }
+                        text += '**';
+                        return text;
+                    }
+
                     let text = "";
                     for (const child of node.childNodes) {
                         text += textContentBuilder(child);
