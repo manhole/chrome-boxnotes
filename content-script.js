@@ -27,6 +27,7 @@ appendSeparator();
     button.title = 'Download body';
     button.addEventListener('click', async () => {
         const contentElem = document.querySelector('.content-container');
+
         const textContentBuilder = (node) => {
             switch (node.nodeType) {
                 case Node.ELEMENT_NODE: {
@@ -47,13 +48,12 @@ appendSeparator();
             return "";
         };
 
-        let text = "";
-
-        const listBuilder = (subElem, level) => {
-            for (const child of subElem.children) {
-                switch (child.tagName) {
+        const listBuilder = (parentElem, level) => {
+            let text = "";
+            for (const elem of parentElem.children) {
+                switch (elem.tagName) {
                     case 'UL': {
-                        listBuilder(child, level + 1);
+                        text += listBuilder(elem, level + 1);
                         break;
                     }
                     case 'LI': {
@@ -61,23 +61,24 @@ appendSeparator();
                             text += '  ';
                         }
                         text += '- ';
-                        if (child.classList.contains('check-list-item')) {
-                            if (child.classList.contains('is-checked')) {
+                        if (elem.classList.contains('check-list-item')) {
+                            if (elem.classList.contains('is-checked')) {
                                 text += '[x] ';
                             } else {
                                 text += '[ ] ';
                             }
                         }
-                        text += textContentBuilder(child);
+                        text += textContentBuilder(elem);
                         text += '\n';
                         break;
                     }
                 }
             }
+            return text;
         };
 
-        let prefix = "";
-        const textBuilder = (parentElem) => {
+        const textBuilder = (parentElem, prefix) => {
+            let text = "";
             for (const elem of parentElem.children) {
                 switch (elem.tagName) {
                     case 'P': {
@@ -102,10 +103,8 @@ appendSeparator();
                     }
                     // ブロック引用
                     case 'BLOCKQUOTE': {
-                        prefix = '> ';
                         // ブロック引用の子要素はPだけと思われる
-                        textBuilder(elem);
-                        prefix = '';
+                        text += textBuilder(elem, '> ');
                         break;
                     }
                     case 'DIV': {
@@ -118,15 +117,15 @@ appendSeparator();
                         // コードブロック
                         if (elem.dataset.componentType === 'code_block') {
                             text += '```\n';
-                            textBuilder(elem);
+                            text += textBuilder(elem, '');
                             text += '```\n';
                             break;
                         }
-                        textBuilder(elem);
+                        text += textBuilder(elem, '');
                         break;
                     }
                     case 'UL': {
-                        listBuilder(elem, 0);
+                        text += listBuilder(elem, 0);
                         break;
                     }
                     // コードブロック右上の "..." 部分
@@ -143,8 +142,10 @@ appendSeparator();
                     }
                 }
             }
+            return text;
         };
-        textBuilder(contentElem);
+
+        const text = textBuilder(contentElem, '');
 
         // console.log(text);
         const title = document.querySelector('.document-title');
