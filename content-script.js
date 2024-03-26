@@ -26,8 +26,6 @@ appendSeparator();
     const button = document.createElement('button');
     button.title = 'Download body';
     button.addEventListener('click', async () => {
-        const contentElem = document.querySelector('.content-container');
-
         const textContentBuilder = (node) => {
             switch (node.nodeType) {
                 case Node.ELEMENT_NODE: {
@@ -145,10 +143,11 @@ appendSeparator();
             return text;
         };
 
+        // 複数のBox Notesを遷移すると ".pad" 要素が複数になる。選択されているものは ".hidden" が付かない。
+        const contentElem = document.querySelector('.pad:not(.hidden) .content-container');
         const text = textBuilder(contentElem, '');
 
-        // console.log(text);
-        const title = document.querySelector('.document-title');
+        const title = document.querySelector('.pad:not(.hidden) .document-title');
         const titleText = title.textContent + '-body.md';
         downloadText(text, titleText);
     });
