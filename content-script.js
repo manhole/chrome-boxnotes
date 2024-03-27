@@ -148,7 +148,7 @@ appendSeparator();
                         break;
                     }
                     default: {
-                        console.warn('unsuppoerted', elem);
+                        console.warn('unsupported', elem);
                         continue;
                     }
                 }
