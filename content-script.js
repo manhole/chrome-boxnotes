@@ -33,6 +33,10 @@ appendSeparator();
                     if (node.tagName === 'DIV' && node.classList.contains('collab-cursor-container')) {
                         return "";
                     }
+                    // "ProseMirror-trailingBreak" は P 要素内の text が空のときに登場しているようだ。P 自体の改行と重複するので除く。
+                    if (node.tagName === 'BR' && !node.classList.contains('ProseMirror-trailingBreak')) {
+                        return '\n';
+                    }
                     if (node.tagName === 'STRONG') {
                         let text = '**';
                         for (const child of node.childNodes) {
