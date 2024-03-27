@@ -45,6 +45,17 @@ appendSeparator();
                         text += '**';
                         return text;
                     }
+                    if (node.tagName === 'A') {
+                        let text = '';
+                        for (const child of node.childNodes) {
+                            text += textContentBuilder(child);
+                        }
+                        // URLが本文にそのまま出現している場合は、わざわざmarkdownせず、URL文字列をそのまま出力する
+                        if (text === node.href) {
+                            return text;
+                        }
+                        return `[${text}](${node.href})`;
+                    }
 
                     let text = "";
                     for (const child of node.childNodes) {
