@@ -78,11 +78,21 @@ appendSeparator();
                         text += listBuilder(elem, level + 1);
                         break;
                     }
+                    case 'OL': {
+                        text += listBuilder(elem, level + 1);
+                        break;
+                    }
                     case 'LI': {
                         for (let i = 0; i < level; i++) {
+                            // ULとOLでスペース数を変える必要があるのだが、後で対応しよう。とりあえずはtext出力できることを優先する
                             text += '  ';
                         }
-                        text += '- ';
+                        if (parentElem.tagName === 'OL') {
+                            text += '1. ';
+                        } else {
+                            // UL しか来ないとは思うが...
+                            text += '- ';
+                        }
                         if (elem.classList.contains('check-list-item')) {
                             if (elem.classList.contains('is-checked')) {
                                 text += '[x] ';
@@ -147,6 +157,10 @@ appendSeparator();
                         break;
                     }
                     case 'UL': {
+                        text += listBuilder(elem, 0);
+                        break;
+                    }
+                    case 'OL': {
                         text += listBuilder(elem, 0);
                         break;
                     }
