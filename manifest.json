@@ -1,6 +1,6 @@
 {
   "name": "Box Notes Extension",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Box Notes utilities",
   "manifest_version": 3,
   "content_scripts": [
