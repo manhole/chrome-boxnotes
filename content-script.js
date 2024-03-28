@@ -172,7 +172,7 @@ appendSeparator();
         const text = textBuilder(contentElem, '');
 
         const title = document.querySelector('.pad:not(.hidden) .document-title');
-        const titleText = title.textContent + '-body.md';
+        const titleText = title.textContent + '.md';
         downloadText(text, titleText);
     });
 
