@@ -1,0 +1,10 @@
+#https://prettier.io/docs/en/configuration.html
+singleQuote = false
+tabWidth = 2
+printWidth = 120
+#trailingComma = "none"
+
+[[overrides]]
+    files = "*.{js,mjs}"
+    [overrides.options]
+    singleQuote = true
