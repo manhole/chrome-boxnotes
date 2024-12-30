@@ -4,7 +4,10 @@
   "main": "content-script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "prettier --write **/*.{js,css}"
+    "lint": "eslint src",
+    "format": "prettier --write **/*.{ts,js}",
+    "compile": "tsc",
+    "build": "run-s compile lint format"
   },
   "author": "manhole",
   "license": "MIT",
