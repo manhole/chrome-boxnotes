@@ -197,7 +197,7 @@ appendSeparator();
 
     const img = document.createElement('img');
     img.src = chrome.runtime.getURL('images/download.svg');
-    img.style = 'width: 80%; height: 80%;'
+    img.style.cssText = 'width: 80%; height: 80%;'
 
     const span = document.createElement('span');
     span.classList.add('buttonicon');
