@@ -164,6 +164,11 @@ appendSeparator();
                         text += listBuilder(elem, 0);
                         break;
                     }
+                    case 'HR': {
+                        text += '---';
+                        text += '\n';
+                        break;
+                    }
                     // コードブロック右上の "..." 部分
                     case 'BUTTON': {
                         break;
