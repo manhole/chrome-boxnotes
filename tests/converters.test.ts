@@ -193,11 +193,10 @@ describe("textBuilder", () => {
     expect(textBuilder(div, "")).toBe("```\n1行目\n3行目\n```\n");
   });
 
-  it("B-09: コードブロック 空行 — <br> のみの cm-line は1行分の改行になる (現状動作)", () => {
+  it("B-09: コードブロック 空行 — <br> のみの cm-line は1行分の改行になる", () => {
     const div = document.createElement("div");
     div.innerHTML = `<div data-component-type="code_block"><div class="cm-content"><div class="cm-line">1行目</div><div class="cm-line"><br></div><div class="cm-line">3行目</div></div></div>`;
-    // 現状のバグ: <br> → "\n" + cm-line末尾"\n" = "\n\n" (空行が2行分になる)
-    expect(textBuilder(div, "")).toBe("```\n1行目\n\n\n3行目\n```\n");
+    expect(textBuilder(div, "")).toBe("```\n1行目\n\n3行目\n```\n");
   });
 
   it("B-10: UL in textBuilder", () => {
@@ -253,11 +252,10 @@ describe("組み合わせ", () => {
     expect(textBuilder(div, "")).toBe("- [ ] 1\n  - [ ] 1-1\n    - [x] 1-1-1\n  - [x] 1-2\n- [ ] 2\n");
   });
 
-  it("C-03: コードブロック (空行あり) — 現状バグの記録", () => {
+  it("C-03: コードブロック (空行あり)", () => {
     const div = document.createElement("div");
     div.innerHTML = `<div data-component-type="code_block"><div class="cm-content"><div class="cm-line">コードブロック1行目</div><div class="cm-line"><br></div><div class="cm-line">コードブロック3行目</div></div></div>`;
-    // バグ: 空行が \n\n になるため、期待値も現状の (バグあり) 動作で記録する
-    expect(textBuilder(div, "")).toBe("```\nコードブロック1行目\n\n\nコードブロック3行目\n```\n");
+    expect(textBuilder(div, "")).toBe("```\nコードブロック1行目\n\nコードブロック3行目\n```\n");
   });
 
   it("C-04: BLOCKQUOTE 3行", () => {

@@ -118,8 +118,10 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string): string => 
       case "DIV": {
         // コードブロックの1行
         if (elem.classList.contains("cm-line")) {
-          text += textContentBuilder(elem);
-          text += "\n";
+          const line = textContentBuilder(elem);
+          // <br> のみの空行は textContentBuilder が "\n" を返すため、
+          // そのまま追加すると末尾の "\n" と合わさって2行分になってしまう。
+          text += (line === "\n" ? "" : line) + "\n";
           break;
         }
         // コードブロック
