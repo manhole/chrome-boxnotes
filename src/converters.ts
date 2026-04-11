@@ -151,8 +151,31 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string): string => 
       case "BUTTON": {
         break;
       }
-      // テーブルは未対応
       case "TABLE": {
+        const tbody = elem.querySelector("tbody");
+        if (!tbody) break;
+        const rows: string[][] = [];
+        for (const trChild of tbody.children) {
+          const tr = trChild as HTMLElement;
+          if (tr.tagName !== "TR") continue;
+          const cells: string[] = [];
+          for (const tdChild of tr.children) {
+            const td = tdChild as HTMLElement;
+            if (td.tagName !== "TD") continue;
+            cells.push(textContentBuilder(td));
+          }
+          rows.push(cells);
+        }
+        if (rows.length === 0) break;
+        const colCount = Math.max(...rows.map((r) => r.length));
+        const toRow = (cells: string[]) => "| " + cells.map((c) => c || " ").join(" | ") + " |";
+        const separator = "| " + Array(colCount).fill("---").join(" | ") + " |";
+        text += toRow(rows[0]) + "\n";
+        text += separator + "\n";
+        for (const row of rows.slice(1)) {
+          text += toRow(row) + "\n";
+        }
+        text += "\n";
         break;
       }
       default: {

@@ -16,6 +16,7 @@ Box Notes の編集画面で本文を Markdown に変換してダウンロード
   - ブロック引用
   - コードブロック
   - 区切り線
+  - テーブル (GFM テーブル形式。1行目をヘッダーとして扱う)
 
 ## セットアップ
 
@@ -47,6 +48,5 @@ npm run build     # compile → lint → format を順次実行
 
 ## 既知の制約
 
-- テーブルは未対応 (DOM は無視される)
-- `colspan` / `rowspan` も未対応
+- テーブルは GFM 形式に対応。`colspan` / `rowspan` は未対応
 - Box 側の DOM 変更により抽出ロジックが影響を受ける可能性あり

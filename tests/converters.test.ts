@@ -211,10 +211,49 @@ describe("textBuilder", () => {
     expect(textBuilder(div, "")).toBe("1. 項目\n");
   });
 
-  it("B-12: TABLE → 無視", () => {
+  it("B-12: TABLE (3行3列) → GFM テーブル出力 (1行目はヘッダー)", () => {
     const div = document.createElement("div");
-    div.innerHTML = `<table><tr><td>x</td></tr></table>`;
-    expect(textBuilder(div, "")).toBe("");
+    div.innerHTML = `
+      <table>
+        <colgroup><col><col><col></colgroup>
+        <tbody>
+          <tr>
+            <td><p><span data-author-id="209800292">1-1</span></p></td>
+            <td><p><span data-author-id="209800292">1-2</span></p></td>
+            <td><p><span data-author-id="209800292">1-3</span></p></td>
+          </tr>
+          <tr>
+            <td><p><span data-author-id="209800292">2-1</span></p></td>
+            <td><p><span data-author-id="209800292">2-2</span></p></td>
+            <td><p><span data-author-id="209800292">2-3</span></p></td>
+          </tr>
+          <tr>
+            <td><p><span data-author-id="209800292">3-1</span></p></td>
+            <td><p><span data-author-id="209800292">3-2</span></p></td>
+            <td><p><span data-author-id="209800292">3-3</span></p></td>
+          </tr>
+        </tbody>
+      </table>`;
+    expect(textBuilder(div, "")).toBe(
+      "| 1-1 | 1-2 | 1-3 |\n" + "| --- | --- | --- |\n" + "| 2-1 | 2-2 | 2-3 |\n" + "| 3-1 | 3-2 | 3-3 |\n" + "\n",
+    );
+  });
+
+  it("B-12b: table-wrapper DIV 経由でも TABLE が GFM 形式で出力される", () => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <div class="table-wrapper notes-table-improvements-enabled">
+        <table>
+          <tbody>
+            <tr>
+              <td><p><span data-author-id="1">A</span></p></td>
+              <td><p><span data-author-id="1">B</span></p></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-sticky-scrollbar"></div>
+      </div>`;
+    expect(textBuilder(div, "")).toBe("| A | B |\n" + "| --- | --- |\n" + "\n");
   });
 
   it("B-13: BUTTON → 無視", () => {
@@ -272,5 +311,20 @@ describe("組み合わせ", () => {
     const div = document.createElement("div");
     div.innerHTML = `<p><br class="ProseMirror-trailingBreak"></p>`;
     expect(textBuilder(div, "")).toBe("\n");
+  });
+
+  it("C-06: P + TABLE + P の混在", () => {
+    const div = document.createElement("div");
+    div.innerHTML = [
+      `<p><span data-author-id="1">前段落</span></p>`,
+      `<table><tbody>`,
+      `<tr><td><p><span data-author-id="1">A</span></p></td><td><p><span data-author-id="1">B</span></p></td></tr>`,
+      `<tr><td><p><span data-author-id="1">C</span></p></td><td><p><span data-author-id="1">D</span></p></td></tr>`,
+      `</tbody></table>`,
+      `<p><span data-author-id="1">後段落</span></p>`,
+    ].join("");
+    expect(textBuilder(div, "")).toBe(
+      "前段落\n" + "| A | B |\n" + "| --- | --- |\n" + "| C | D |\n" + "\n" + "後段落\n",
+    );
   });
 });
