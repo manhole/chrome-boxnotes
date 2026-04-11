@@ -100,10 +100,12 @@ export const listBuilder = (parentElem: HTMLElement, level: number): string => {
   return text;
 };
 
-export const textBuilder = (parentElem: HTMLElement, prefix: string): string => {
+export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlocks = true): string => {
   let text = "";
+  let prevTag = "";
   for (const child of parentElem.children) {
     const elem = child as HTMLElement;
+    const prevLen = text.length;
     switch (elem.tagName) {
       case "P": {
         text += prefix + textContentBuilder(elem);
@@ -128,7 +130,7 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string): string => 
       // ブロック引用
       case "BLOCKQUOTE": {
         // ブロック引用の子要素はPだけと思われる
-        text += textBuilder(elem, "> ");
+        text += textBuilder(elem, "> ", false);
         break;
       }
       case "DIV": {
@@ -143,11 +145,11 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string): string => 
         // コードブロック
         if (elem.dataset.componentType === "code_block") {
           text += "```\n";
-          text += textBuilder(elem, "");
+          text += textBuilder(elem, "", false);
           text += "```\n";
           break;
         }
-        text += textBuilder(elem, "");
+        text += textBuilder(elem, "", separateBlocks);
         break;
       }
       case "UL": {
@@ -236,12 +238,22 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string): string => 
         for (const row of rows.slice(1)) {
           text += toRow(row) + "\n";
         }
-        text += "\n";
         break;
       }
       default: {
         console.warn("unsupported", elem);
         continue;
+      }
+    }
+    // 異種ブロック境界に空行を挿入 (同種ブロック間・空 P の前後は入れない)
+    if (text.length > prevLen) {
+      // 空 P (改行のみ) はユーザーが意図した空行なので、境界判定に関与させない
+      const isEmptyP = elem.tagName === "P" && text.length - prevLen === 1;
+      if (!isEmptyP) {
+        if (prevTag !== "" && prevTag !== elem.tagName && separateBlocks) {
+          text = text.slice(0, prevLen) + "\n" + text.slice(prevLen);
+        }
+        prevTag = elem.tagName;
       }
     }
   }

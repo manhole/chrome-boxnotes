@@ -259,7 +259,7 @@ describe("textBuilder", () => {
         </tbody>
       </table>`;
     expect(textBuilder(div, "")).toBe(
-      "| 1-1 | 1-2 | 1-3 |\n" + "| --- | --- | --- |\n" + "| 2-1 | 2-2 | 2-3 |\n" + "| 3-1 | 3-2 | 3-3 |\n" + "\n",
+      "| 1-1 | 1-2 | 1-3 |\n" + "| --- | --- | --- |\n" + "| 2-1 | 2-2 | 2-3 |\n" + "| 3-1 | 3-2 | 3-3 |\n",
     );
   });
 
@@ -277,7 +277,7 @@ describe("textBuilder", () => {
         </table>
         <div class="table-sticky-scrollbar"></div>
       </div>`;
-    expect(textBuilder(div, "")).toBe("| A | B |\n" + "| --- | --- |\n" + "\n");
+    expect(textBuilder(div, "")).toBe("| A | B |\n" + "| --- | --- |\n");
   });
 
   it("B-13: BUTTON → 無視", () => {
@@ -290,7 +290,7 @@ describe("textBuilder", () => {
     const div = document.createElement("div");
     div.innerHTML = `<div class="table-wrapper notes-table-improvements-enabled scrollable" spellcheck="true"><table style="width: 420px;"><colgroup><col><col><col></colgroup><tbody><tr><td><p><span data-author-id="209800292">1-1</span></p></td><td><p><span data-author-id="209800292">1-2</span></p></td><td><p><span data-author-id="209800292">1-3</span></p></td></tr><tr><td rowspan="2"><p><span data-author-id="209800292">2-1</span></p><p><span data-author-id="209800292">3-1</span></p></td><td><p><span data-author-id="209800292">2-2</span></p></td><td><p><span data-author-id="209800292">2-3</span></p></td></tr><tr><td><p><span data-author-id="209800292">3-2</span></p></td><td><p><span data-author-id="209800292">3-3</span></p></td></tr></tbody></table></div>`;
     expect(textBuilder(div, "")).toBe(
-      "| 1-1 | 1-2 | 1-3 |\n" + "| --- | --- | --- |\n" + "| 2-1<br>3-1 | 2-2 | 2-3 |\n" + "|   | 3-2 | 3-3 |\n" + "\n",
+      "| 1-1 | 1-2 | 1-3 |\n" + "| --- | --- | --- |\n" + "| 2-1<br>3-1 | 2-2 | 2-3 |\n" + "|   | 3-2 | 3-3 |\n",
     );
   });
 
@@ -298,7 +298,7 @@ describe("textBuilder", () => {
     const div = document.createElement("div");
     div.innerHTML = `<div class="table-wrapper notes-table-improvements-enabled" spellcheck="true"><table style="min-width: 420px;"><colgroup><col><col><col></colgroup><tbody><tr><td><p><span data-author-id="209800292">1-1</span></p></td><td><p><span data-author-id="209800292">1-2</span></p></td><td><p><span data-author-id="209800292">1-3</span></p></td></tr><tr><td><p><span data-author-id="209800292">2-1</span></p></td><td colspan="2"><p><span data-author-id="209800292">2-2</span></p><p><span data-author-id="209800292">2-3</span></p></td></tr><tr><td><p><span data-author-id="209800292">3-1</span></p></td><td><p><span data-author-id="209800292">3-2</span></p></td><td><p><span data-author-id="209800292">3-3</span></p></td></tr></tbody></table></div>`;
     expect(textBuilder(div, "")).toBe(
-      "| 1-1 | 1-2 | 1-3 |\n" + "| --- | --- | --- |\n" + "| 2-1 | 2-2<br>2-3 |   |\n" + "| 3-1 | 3-2 | 3-3 |\n" + "\n",
+      "| 1-1 | 1-2 | 1-3 |\n" + "| --- | --- | --- |\n" + "| 2-1 | 2-2<br>2-3 |   |\n" + "| 3-1 | 3-2 | 3-3 |\n",
     );
   });
 });
@@ -314,7 +314,7 @@ describe("組み合わせ", () => {
       `<h2><span data-author-id="1">見出し2</span></h2>`,
       `<ul>${boxLi("a")}<ul>${boxLi("b")}<ul>${boxLi("c")}</ul></ul></ul>`,
     ].join("");
-    expect(textBuilder(div, "")).toBe("# 見出し1\n## 見出し2\n- a\n  - b\n    - c\n");
+    expect(textBuilder(div, "")).toBe("# 見出し1\n\n## 見出し2\n\n- a\n  - b\n    - c\n");
   });
 
   it("C-02: チェックリスト ON/OFF 混在 + ネスト (実際の Box Notes 構造)", () => {
@@ -363,8 +363,46 @@ describe("組み合わせ", () => {
       `</tbody></table>`,
       `<p><span data-author-id="1">後段落</span></p>`,
     ].join("");
-    expect(textBuilder(div, "")).toBe(
-      "前段落\n" + "| A | B |\n" + "| --- | --- |\n" + "| C | D |\n" + "\n" + "後段落\n",
-    );
+    expect(textBuilder(div, "")).toBe("前段落\n" + "\n| A | B |\n" + "| --- | --- |\n" + "| C | D |\n" + "\n後段落\n");
+  });
+
+  it("C-07: 連続する P 要素間に空行が入らないこと", () => {
+    const div = document.createElement("div");
+    div.innerHTML = [
+      `<p><span data-author-id="1">段落1</span></p>`,
+      `<p><span data-author-id="1">段落2</span></p>`,
+      `<p><span data-author-id="1">段落3</span></p>`,
+    ].join("");
+    expect(textBuilder(div, "")).toBe("段落1\n段落2\n段落3\n");
+  });
+
+  it("C-08: BLOCKQUOTE 前後に空行が入り、内部 P 間には入らない", () => {
+    const div = document.createElement("div");
+    div.innerHTML = [
+      `<p><span data-author-id="1">前段落</span></p>`,
+      `<blockquote><p><span data-author-id="1">引用1</span></p><p><span data-author-id="1">引用2</span></p></blockquote>`,
+      `<p><span data-author-id="1">後段落</span></p>`,
+    ].join("");
+    expect(textBuilder(div, "")).toBe("前段落\n\n> 引用1\n> 引用2\n\n後段落\n");
+  });
+
+  it("C-09: H1 → P → UL の混在パターン", () => {
+    const div = document.createElement("div");
+    div.innerHTML = [
+      `<h1><span data-author-id="1">見出し</span></h1>`,
+      `<p><span data-author-id="1">段落</span></p>`,
+      `<ul>${boxLi("項目")}</ul>`,
+    ].join("");
+    expect(textBuilder(div, "")).toBe("# 見出し\n\n段落\n\n- 項目\n");
+  });
+
+  it("C-10: UL → 空 P → UL — 空行が3つにならず1つだけ", () => {
+    const div = document.createElement("div");
+    div.innerHTML = [
+      `<ul>${boxLi("項目1")}</ul>`,
+      `<p><br class="ProseMirror-trailingBreak"></p>`,
+      `<ul>${boxLi("項目2")}</ul>`,
+    ].join("");
+    expect(textBuilder(div, "")).toBe("- 項目1\n\n- 項目2\n");
   });
 });

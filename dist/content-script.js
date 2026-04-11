@@ -94,10 +94,12 @@
     }
     return text;
   };
-  var textBuilder = (parentElem, prefix) => {
+  var textBuilder = (parentElem, prefix, separateBlocks = true) => {
     let text = '';
+    let prevTag = '';
     for (const child of parentElem.children) {
       const elem = child;
+      const prevLen = text.length;
       switch (elem.tagName) {
         case 'P': {
           text += prefix + textContentBuilder(elem);
@@ -121,7 +123,7 @@
         }
         // ブロック引用
         case 'BLOCKQUOTE': {
-          text += textBuilder(elem, '> ');
+          text += textBuilder(elem, '> ', false);
           break;
         }
         case 'DIV': {
@@ -132,11 +134,11 @@
           }
           if (elem.dataset.componentType === 'code_block') {
             text += '```\n';
-            text += textBuilder(elem, '');
+            text += textBuilder(elem, '', false);
             text += '```\n';
             break;
           }
-          text += textBuilder(elem, '');
+          text += textBuilder(elem, '', separateBlocks);
           break;
         }
         case 'UL': {
@@ -216,12 +218,20 @@
           for (const row of rows.slice(1)) {
             text += toRow(row) + '\n';
           }
-          text += '\n';
           break;
         }
         default: {
           console.warn('unsupported', elem);
           continue;
+        }
+      }
+      if (text.length > prevLen) {
+        const isEmptyP = elem.tagName === 'P' && text.length - prevLen === 1;
+        if (!isEmptyP) {
+          if (prevTag !== '' && prevTag !== elem.tagName && separateBlocks) {
+            text = text.slice(0, prevLen) + '\n' + text.slice(prevLen);
+          }
+          prevTag = elem.tagName;
         }
       }
     }

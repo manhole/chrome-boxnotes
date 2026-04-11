@@ -46,7 +46,7 @@ Chrome 拡張のファイル構成:
    - `.pad:not(.hidden) .content-container` から本文 DOM を取得。
    - `textContentBuilder()` — インライン要素 (STRONG, EM, S, A, BR など) をテキストに変換する再帰関数。
    - `listBuilder()` — UL/OL/LI を Markdown リストに変換。ネスト深さをインデントで表現。
-   - `textBuilder()` — ブロック要素 (P, H1-H3, BLOCKQUOTE, DIV[code_block], UL, OL, HR, TABLE) を走査してテキストを組み立てる再帰関数。
+   - `textBuilder()` — ブロック要素 (P, H1-H3, BLOCKQUOTE, DIV[code_block], UL, OL, HR, TABLE) を走査してテキストを組み立てる再帰関数。第3引数 `separateBlocks` で異種ブロック間の空行挿入を制御 (BLOCKQUOTE・コードブロック内部では `false`)。
    - `.pad:not(.hidden) .document-title` からファイル名を取得し `.md` として `Blob` ダウンロード。
 
 ### 注意点
