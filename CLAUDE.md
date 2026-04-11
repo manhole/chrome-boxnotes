@@ -51,7 +51,7 @@ Chrome 拡張のファイル構成:
 
 ### 注意点
 
-- TABLE 要素は `tbody > tr > td` を走査し、`textContentBuilder` でセル内容を変換して GFM テーブル形式で出力する。1行目をヘッダーとして扱い区切り行を挿入。`.content-container` の直接の子は `DIV.table-wrapper` であり、既存の DIV 再帰処理を経由して TABLE ケースに到達する。`colspan` / `rowspan` は未対応。
+- TABLE 要素は `tbody > tr > td` を走査し、GFM テーブル形式で出力する。1行目をヘッダーとして扱い区切り行を挿入。`.content-container` の直接の子は `DIV.table-wrapper` であり、既存の DIV 再帰処理を経由して TABLE ケースに到達する。`colspan` / `rowspan` は 2D グリッド展開で対応済み。結合セルの後続は空セルで補完する。セル内に複数 P がある場合は `<br>` で区切って連結する。
 - 複数の Box Notes タブを遷移すると `.pad` 要素が複数存在するため、`.pad:not(.hidden)` で現在表示中のものを選択している。
 - コードブロックは `div[data-component-type="code_block"]` 内の `div.cm-line` を行単位で取得する構造。
 - `collab-cursor-container` はコラボレーターのカーソル名称を含むため、テキスト変換時に除外している。

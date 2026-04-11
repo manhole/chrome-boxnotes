@@ -261,6 +261,22 @@ describe("textBuilder", () => {
     div.innerHTML = `<button>click</button>`;
     expect(textBuilder(div, "")).toBe("");
   });
+
+  it("B-14: rowspan=2 (列0が2行にまたがる) — 後続行の列0は空セル", () => {
+    const div = document.createElement("div");
+    div.innerHTML = `<div class="table-wrapper notes-table-improvements-enabled scrollable" spellcheck="true"><table style="width: 420px;"><colgroup><col><col><col></colgroup><tbody><tr><td><p><span data-author-id="209800292">1-1</span></p></td><td><p><span data-author-id="209800292">1-2</span></p></td><td><p><span data-author-id="209800292">1-3</span></p></td></tr><tr><td rowspan="2"><p><span data-author-id="209800292">2-1</span></p><p><span data-author-id="209800292">3-1</span></p></td><td><p><span data-author-id="209800292">2-2</span></p></td><td><p><span data-author-id="209800292">2-3</span></p></td></tr><tr><td><p><span data-author-id="209800292">3-2</span></p></td><td><p><span data-author-id="209800292">3-3</span></p></td></tr></tbody></table></div>`;
+    expect(textBuilder(div, "")).toBe(
+      "| 1-1 | 1-2 | 1-3 |\n" + "| --- | --- | --- |\n" + "| 2-1<br>3-1 | 2-2 | 2-3 |\n" + "|   | 3-2 | 3-3 |\n" + "\n",
+    );
+  });
+
+  it("B-15: colspan=2 (行1の列1-2が結合) — 結合後の列は空セル", () => {
+    const div = document.createElement("div");
+    div.innerHTML = `<div class="table-wrapper notes-table-improvements-enabled" spellcheck="true"><table style="min-width: 420px;"><colgroup><col><col><col></colgroup><tbody><tr><td><p><span data-author-id="209800292">1-1</span></p></td><td><p><span data-author-id="209800292">1-2</span></p></td><td><p><span data-author-id="209800292">1-3</span></p></td></tr><tr><td><p><span data-author-id="209800292">2-1</span></p></td><td colspan="2"><p><span data-author-id="209800292">2-2</span></p><p><span data-author-id="209800292">2-3</span></p></td></tr><tr><td><p><span data-author-id="209800292">3-1</span></p></td><td><p><span data-author-id="209800292">3-2</span></p></td><td><p><span data-author-id="209800292">3-3</span></p></td></tr></tbody></table></div>`;
+    expect(textBuilder(div, "")).toBe(
+      "| 1-1 | 1-2 | 1-3 |\n" + "| --- | --- | --- |\n" + "| 2-1 | 2-2<br>2-3 |   |\n" + "| 3-1 | 3-2 | 3-3 |\n" + "\n",
+    );
+  });
 });
 
 // -------------------------------------------------------------------

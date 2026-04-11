@@ -154,20 +154,65 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string): string => 
       case "TABLE": {
         const tbody = elem.querySelector("tbody");
         if (!tbody) break;
-        const rows: string[][] = [];
+        // TD 専用テキスト化: 直接の子が P の場合は <br> で連結、それ以外は textContentBuilder に委譲
+        const cellContentBuilder = (td: HTMLTableCellElement): string => {
+          const pChildren = Array.from(td.children).filter((c) => c.tagName === "P");
+          if (pChildren.length === 0) {
+            return textContentBuilder(td);
+          }
+          return pChildren.map((p) => textContentBuilder(p as HTMLElement)).join("<br>");
+        };
+        // colspan/rowspan に対応した 2D グリッド展開
+        type PendingCell = { value: string; remaining: number };
+        const pendingRowspan: (PendingCell | undefined)[] = [];
+        const grid: string[][] = [];
         for (const trChild of tbody.children) {
           const tr = trChild as HTMLElement;
           if (tr.tagName !== "TR") continue;
-          const cells: string[] = [];
-          for (const tdChild of tr.children) {
-            const td = tdChild as HTMLElement;
-            if (td.tagName !== "TD") continue;
-            cells.push(textContentBuilder(td));
+          const rowIndex = grid.length;
+          grid.push([]);
+          // Phase 1: pending セルを現在行に書き込み、remaining を -1 する
+          // occupiedCols: この行で pending が占有している列の集合 (Phase 2 のスキップ判定に使う)
+          const occupiedCols = new Set<number>();
+          for (let col = 0; col < pendingRowspan.length; col++) {
+            const p = pendingRowspan[col];
+            if (p != null) {
+              grid[rowIndex][col] = p.value;
+              occupiedCols.add(col);
+              p.remaining -= 1;
+              if (p.remaining === 0) {
+                pendingRowspan[col] = undefined;
+              }
+            }
           }
-          rows.push(cells);
+          // Phase 2: TD を走査してグリッドに配置
+          let gridCol = 0;
+          for (const tdChild of tr.children) {
+            const td = tdChild as HTMLTableCellElement;
+            if (td.tagName !== "TD") continue;
+            // pending が占有している列をスキップ
+            while (occupiedCols.has(gridCol)) {
+              gridCol++;
+            }
+            const colspan = td.colSpan;
+            const rowspan = td.rowSpan;
+            const value = cellContentBuilder(td);
+            // colspan 分だけ書き込む (先頭は value、以降は空)
+            for (let c = 0; c < colspan; c++) {
+              grid[rowIndex][gridCol + c] = c === 0 ? value : "";
+            }
+            // rowspan > 1 なら次行以降への引き継ぎを登録
+            if (rowspan > 1) {
+              for (let c = 0; c < colspan; c++) {
+                pendingRowspan[gridCol + c] = { value: "", remaining: rowspan - 1 };
+              }
+            }
+            gridCol += colspan;
+          }
         }
-        if (rows.length === 0) break;
-        const colCount = Math.max(...rows.map((r) => r.length));
+        if (grid.length === 0) break;
+        const colCount = Math.max(...grid.map((r) => r.length));
+        const rows = grid.map((row) => Array.from({ length: colCount }, (_, i) => row[i] ?? ""));
         const toRow = (cells: string[]) => "| " + cells.map((c) => c || " ").join(" | ") + " |";
         const separator = "| " + Array(colCount).fill("---").join(" | ") + " |";
         text += toRow(rows[0]) + "\n";

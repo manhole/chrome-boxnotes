@@ -143,20 +143,56 @@
         case 'TABLE': {
           const tbody = elem.querySelector('tbody');
           if (!tbody) break;
-          const rows = [];
+          const cellContentBuilder = (td) => {
+            const pChildren = Array.from(td.children).filter((c) => c.tagName === 'P');
+            if (pChildren.length === 0) {
+              return textContentBuilder(td);
+            }
+            return pChildren.map((p) => textContentBuilder(p)).join('<br>');
+          };
+          const pendingRowspan = [];
+          const grid = [];
           for (const trChild of tbody.children) {
             const tr = trChild;
             if (tr.tagName !== 'TR') continue;
-            const cells = [];
+            const rowIndex = grid.length;
+            grid.push([]);
+            const occupiedCols = /* @__PURE__ */ new Set();
+            for (let col = 0; col < pendingRowspan.length; col++) {
+              const p = pendingRowspan[col];
+              if (p != null) {
+                grid[rowIndex][col] = p.value;
+                occupiedCols.add(col);
+                p.remaining -= 1;
+                if (p.remaining === 0) {
+                  pendingRowspan[col] = void 0;
+                }
+              }
+            }
+            let gridCol = 0;
             for (const tdChild of tr.children) {
               const td = tdChild;
               if (td.tagName !== 'TD') continue;
-              cells.push(textContentBuilder(td));
+              while (occupiedCols.has(gridCol)) {
+                gridCol++;
+              }
+              const colspan = td.colSpan;
+              const rowspan = td.rowSpan;
+              const value = cellContentBuilder(td);
+              for (let c = 0; c < colspan; c++) {
+                grid[rowIndex][gridCol + c] = c === 0 ? value : '';
+              }
+              if (rowspan > 1) {
+                for (let c = 0; c < colspan; c++) {
+                  pendingRowspan[gridCol + c] = { value: '', remaining: rowspan - 1 };
+                }
+              }
+              gridCol += colspan;
             }
-            rows.push(cells);
           }
-          if (rows.length === 0) break;
-          const colCount = Math.max(...rows.map((r) => r.length));
+          if (grid.length === 0) break;
+          const colCount = Math.max(...grid.map((r) => r.length));
+          const rows = grid.map((row) => Array.from({ length: colCount }, (_, i) => row[i] ?? ''));
           const toRow = (cells) => '| ' + cells.map((c) => c || ' ').join(' | ') + ' |';
           const separator = '| ' + Array(colCount).fill('---').join(' | ') + ' |';
           text += toRow(rows[0]) + '\n';
