@@ -46,12 +46,12 @@ Chrome 拡張のファイル構成:
    - `.pad:not(.hidden) .content-container` から本文 DOM を取得。
    - `textContentBuilder()` — インライン要素 (STRONG, A, BR など) をテキストに変換する再帰関数。
    - `listBuilder()` — UL/OL/LI を Markdown リストに変換。ネスト深さをインデントで表現。
-   - `textBuilder()` — ブロック要素 (P, H1-H3, BLOCKQUOTE, DIV[code_block], UL, OL, HR) を走査してテキストを組み立てる再帰関数。
+   - `textBuilder()` — ブロック要素 (P, H1-H3, BLOCKQUOTE, DIV[code_block], UL, OL, HR, TABLE) を走査してテキストを組み立てる再帰関数。
    - `.pad:not(.hidden) .document-title` からファイル名を取得し `.md` として `Blob` ダウンロード。
 
 ### 注意点
 
-- TABLE 要素は `textBuilder` 内で無視されている (未対応。README の既知の制約を参照)。
+- TABLE 要素は `tbody > tr > td` を走査し、`textContentBuilder` でセル内容を変換して GFM テーブル形式で出力する。1行目をヘッダーとして扱い区切り行を挿入。`.content-container` の直接の子は `DIV.table-wrapper` であり、既存の DIV 再帰処理を経由して TABLE ケースに到達する。`colspan` / `rowspan` は未対応。
 - 複数の Box Notes タブを遷移すると `.pad` 要素が複数存在するため、`.pad:not(.hidden)` で現在表示中のものを選択している。
 - コードブロックは `div[data-component-type="code_block"]` 内の `div.cm-line` を行単位で取得する構造。
 - `collab-cursor-container` はコラボレーターのカーソル名称を含むため、テキスト変換時に除外している。
@@ -139,3 +139,22 @@ LI 内部は `SPAN.check-list-item-checkbox-container` (チェックボックス
 ```
 
 直下は P のみ。
+
+### テーブル
+
+```html
+<div class="table-wrapper notes-table-improvements-enabled" spellcheck="true">
+  <table style="min-width: 420px;">
+    <colgroup><col><col><col></colgroup>
+    <tbody>
+      <tr>
+        <td><p><span data-author-id="209800292">1-1</span></p></td>
+        <td><p><span data-author-id="209800292">1-2</span></p></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="table-sticky-scrollbar" style="display: none;"></div>
+</div>
+```
+
+`<thead>` / `<th>` は存在せず、全セルが `<tbody>` 内の `<td>`。`.content-container` の直接の子は `DIV.table-wrapper` であり、TABLE 要素が直接来ることはない。`textBuilder` の DIV 再帰処理を経由して TABLE ケースに到達する。
