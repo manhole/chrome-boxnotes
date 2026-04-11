@@ -82,6 +82,30 @@ describe("textContentBuilder", () => {
     const p = el(`<p>hello <strong>world</strong></p>`);
     expect(textContentBuilder(p)).toBe("hello **world**");
   });
+
+  it("T-12: EM → *italic*", () => {
+    const em = el(`<em><span data-author-id="209800292">イタリック</span></em>`);
+    expect(textContentBuilder(em)).toBe("*イタリック*");
+  });
+
+  it("T-13: EM を含む P — 前後テキストとの混在", () => {
+    const p = el(
+      `<p><span data-author-id="209800292">あいうえお、</span><em><span data-author-id="209800292">イタリック</span></em><span data-author-id="209800292">、かきくけこ</span></p>`,
+    );
+    expect(textContentBuilder(p)).toBe("あいうえお、*イタリック*、かきくけこ");
+  });
+
+  it("T-14: S → ~~取り消し線~~", () => {
+    const s = el(`<s><span data-author-id="209800292">取り消し線</span></s>`);
+    expect(textContentBuilder(s)).toBe("~~取り消し線~~");
+  });
+
+  it("T-15: S を含む P — 前後テキストとの混在", () => {
+    const p = el(
+      `<p><span data-author-id="209800292">あいうえお、</span><s><span data-author-id="209800292">取り消し線</span></s><span data-author-id="209800292">、かきくけこ</span></p>`,
+    );
+    expect(textContentBuilder(p)).toBe("あいうえお、~~取り消し線~~、かきくけこ");
+  });
 });
 
 // -------------------------------------------------------------------

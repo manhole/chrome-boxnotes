@@ -18,6 +18,22 @@
           text2 += '**';
           return text2;
         }
+        if (node.tagName === 'EM') {
+          let text2 = '*';
+          for (const child of node.childNodes) {
+            text2 += textContentBuilder(child);
+          }
+          text2 += '*';
+          return text2;
+        }
+        if (node.tagName === 'S') {
+          let text2 = '~~';
+          for (const child of node.childNodes) {
+            text2 += textContentBuilder(child);
+          }
+          text2 += '~~';
+          return text2;
+        }
         if (node.tagName === 'A') {
           const anchor = node;
           let text2 = '';

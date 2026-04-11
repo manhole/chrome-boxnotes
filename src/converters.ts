@@ -19,6 +19,22 @@ export const textContentBuilder = (node: HTMLElement): string => {
         text += "**";
         return text;
       }
+      if (node.tagName === "EM") {
+        let text = "*";
+        for (const child of node.childNodes) {
+          text += textContentBuilder(child as HTMLElement);
+        }
+        text += "*";
+        return text;
+      }
+      if (node.tagName === "S") {
+        let text = "~~";
+        for (const child of node.childNodes) {
+          text += textContentBuilder(child as HTMLElement);
+        }
+        text += "~~";
+        return text;
+      }
       if (node.tagName === "A") {
         const anchor = node as HTMLAnchorElement;
         let text = "";

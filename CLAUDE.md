@@ -44,7 +44,7 @@ Chrome 拡張のファイル構成:
 2. `mainScript()` はメニューにセパレーターとダウンロードボタンを追加する。
 3. ボタンクリック時:
    - `.pad:not(.hidden) .content-container` から本文 DOM を取得。
-   - `textContentBuilder()` — インライン要素 (STRONG, A, BR など) をテキストに変換する再帰関数。
+   - `textContentBuilder()` — インライン要素 (STRONG, EM, S, A, BR など) をテキストに変換する再帰関数。
    - `listBuilder()` — UL/OL/LI を Markdown リストに変換。ネスト深さをインデントで表現。
    - `textBuilder()` — ブロック要素 (P, H1-H3, BLOCKQUOTE, DIV[code_block], UL, OL, HR, TABLE) を走査してテキストを組み立てる再帰関数。
    - `.pad:not(.hidden) .document-title` からファイル名を取得し `.md` として `Blob` ダウンロード。
@@ -69,6 +69,15 @@ Box Notes 側の DOM が変更されたときの確認用に記録する。
 ```
 
 `data-author-id` は著者 ID。複数著者が編集した箇所では SPAN が分割される。
+
+### インライン装飾 (イタリック・取り消し線)
+
+```html
+<em><span data-author-id="209800292">イタリック</span></em>
+<s><span data-author-id="209800292">取り消し線</span></s>
+```
+
+P 内で通常テキストの SPAN と混在する。`EM` → `*text*`、`S` → `~~text~~` に変換。
 
 ### 見出し (H1)
 
