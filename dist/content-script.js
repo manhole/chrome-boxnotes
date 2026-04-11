@@ -34,6 +34,14 @@
           text2 += '~~';
           return text2;
         }
+        if (node.tagName === 'CODE') {
+          let text2 = '`';
+          for (const child of node.childNodes) {
+            text2 += textContentBuilder(child);
+          }
+          text2 += '`';
+          return text2;
+        }
         if (node.tagName === 'A') {
           const anchor = node;
           let text2 = '';

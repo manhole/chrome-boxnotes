@@ -106,6 +106,18 @@ describe("textContentBuilder", () => {
     );
     expect(textContentBuilder(p)).toBe("あいうえお、~~取り消し線~~、かきくけこ");
   });
+
+  it("T-16: CODE → `inline code`", () => {
+    const code = el(`<code class="inline-code"><span data-author-id="209800292">hoge</span></code>`);
+    expect(textContentBuilder(code)).toBe("`hoge`");
+  });
+
+  it("T-17: CODE を含む P — 前後テキストとの混在", () => {
+    const p = el(
+      `<p><span data-author-id="209800292">変数名 </span><code class="inline-code"><span data-author-id="209800292">hoge</span></code><span data-author-id="209800292"> だよ。</span></p>`,
+    );
+    expect(textContentBuilder(p)).toBe("変数名 `hoge` だよ。");
+  });
 });
 
 // -------------------------------------------------------------------
