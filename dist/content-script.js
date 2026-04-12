@@ -1,6 +1,16 @@
 'use strict';
 (() => {
   // src/converters.ts
+  var LANG_INFO_STRING_MAP = {
+    shell: 'sh',
+    'c++': 'cpp',
+    'c#': 'csharp',
+  };
+  var toInfoString = (langLabel) => {
+    if (!langLabel || langLabel === 'Plain text') return '';
+    const key = langLabel.toLowerCase();
+    return LANG_INFO_STRING_MAP[key] ?? key;
+  };
   var textContentBuilder = (node) => {
     switch (node.nodeType) {
       case Node.ELEMENT_NODE: {
@@ -142,7 +152,7 @@
           }
           if (elem.dataset.componentType === 'code_block') {
             const langLabel = elem.querySelector('.languages-dropdown-button .menu-toggle')?.textContent?.trim() ?? '';
-            const lang = langLabel && langLabel !== 'Plain text' ? langLabel.toLowerCase() : '';
+            const lang = toInfoString(langLabel);
             text += '```' + lang + '\n';
             text += textBuilder(elem, '', false);
             text += '```\n';

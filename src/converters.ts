@@ -1,5 +1,19 @@
 "use strict";
 
+// Box Notes の言語ドロップダウン表示名 → Markdown info string。
+// 小文字化しただけでは一般的なハイライタに認識されない言語のみ明示マッピングする。
+const LANG_INFO_STRING_MAP: Record<string, string> = {
+  shell: "sh",
+  "c++": "cpp",
+  "c#": "csharp",
+};
+
+const toInfoString = (langLabel: string): string => {
+  if (!langLabel || langLabel === "Plain text") return "";
+  const key = langLabel.toLowerCase();
+  return LANG_INFO_STRING_MAP[key] ?? key;
+};
+
 export const textContentBuilder = (node: HTMLElement): string => {
   switch (node.nodeType) {
     case Node.ELEMENT_NODE: {
@@ -152,10 +166,11 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlo
         }
         // コードブロック
         if (elem.dataset.componentType === "code_block") {
-          // codeblock-topbar の languages-dropdown-button から言語名を取得。
-          // "Plain text" は言語指定なしとして扱う。それ以外は小文字化して info string にする。
+          // codeblock-topbar の languages-dropdown-button から言語名を取得し info string に正規化する。
+          // "Plain text" は言語指定なし。それ以外は一般的な Markdown info string へマッピングする
+          // (Linguist / highlight.js 互換)。マップにないものはフォールバックで小文字化する。
           const langLabel = elem.querySelector(".languages-dropdown-button .menu-toggle")?.textContent?.trim() ?? "";
-          const lang = langLabel && langLabel !== "Plain text" ? langLabel.toLowerCase() : "";
+          const lang = toInfoString(langLabel);
           text += "```" + lang + "\n";
           text += textBuilder(elem, "", false);
           text += "```\n";

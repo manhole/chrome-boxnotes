@@ -253,6 +253,24 @@ describe("textBuilder", () => {
     expect(textBuilder(div, "")).toBe("```java\npublic static void main() {}\n```\n");
   });
 
+  it("B-09e: コードブロック 言語指定 Shell → ```sh", () => {
+    const div = document.createElement("div");
+    div.innerHTML = `<div data-component-type="code_block"><div class="codeblock-topbar"><button class="languages-dropdown-button"><span class="menu-toggle">Shell</span></button></div><div class="cm-content"><div class="cm-line">ls -l</div></div></div>`;
+    expect(textBuilder(div, "")).toBe("```sh\nls -l\n```\n");
+  });
+
+  it("B-09f: コードブロック 言語指定 C++ → ```cpp", () => {
+    const div = document.createElement("div");
+    div.innerHTML = `<div data-component-type="code_block"><div class="codeblock-topbar"><button class="languages-dropdown-button"><span class="menu-toggle">C++</span></button></div><div class="cm-content"><div class="cm-line">// cpp</div></div></div>`;
+    expect(textBuilder(div, "")).toBe("```cpp\n// cpp\n```\n");
+  });
+
+  it("B-09g: コードブロック 言語指定 C# → ```csharp", () => {
+    const div = document.createElement("div");
+    div.innerHTML = `<div data-component-type="code_block"><div class="codeblock-topbar"><button class="languages-dropdown-button"><span class="menu-toggle">C#</span></button></div><div class="cm-content"><div class="cm-line">// C#</div></div></div>`;
+    expect(textBuilder(div, "")).toBe("```csharp\n// C#\n```\n");
+  });
+
   it("B-10: UL in textBuilder", () => {
     const div = document.createElement("div");
     div.innerHTML = `<ul>${boxLi("項目")}</ul>`;
