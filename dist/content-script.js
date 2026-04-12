@@ -141,7 +141,9 @@
             break;
           }
           if (elem.dataset.componentType === 'code_block') {
-            text += '```\n';
+            const langLabel = elem.querySelector('.languages-dropdown-button .menu-toggle')?.textContent?.trim() ?? '';
+            const lang = langLabel && langLabel !== 'Plain text' ? langLabel.toLowerCase() : '';
+            text += '```' + lang + '\n';
             text += textBuilder(elem, '', false);
             text += '```\n';
             break;

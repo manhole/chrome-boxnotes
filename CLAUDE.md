@@ -146,6 +146,8 @@ LI 内部は `SPAN.check-list-item-checkbox-container` (チェックボックス
 
 空行は `<div class="cm-line"><br></div>`。`<br>` が `textContentBuilder` で `"\n"` になるため、cm-line 処理では `line === "\n"` のとき `""` として扱う (そうしないと改行が2行分になる)。
 
+言語名は `.codeblock-topbar .languages-dropdown-button .menu-toggle` の textContent から取得する (例: `"Plain text"`, `"SQL"`, `"Java"`)。`"Plain text"` は info string なしとして扱い、それ以外は小文字化して `` ```sql ``, `` ```java `` のように出力する。
+
 ### BLOCKQUOTE
 
 ```html

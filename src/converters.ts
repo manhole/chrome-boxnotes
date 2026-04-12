@@ -152,7 +152,11 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlo
         }
         // コードブロック
         if (elem.dataset.componentType === "code_block") {
-          text += "```\n";
+          // codeblock-topbar の languages-dropdown-button から言語名を取得。
+          // "Plain text" は言語指定なしとして扱う。それ以外は小文字化して info string にする。
+          const langLabel = elem.querySelector(".languages-dropdown-button .menu-toggle")?.textContent?.trim() ?? "";
+          const lang = langLabel && langLabel !== "Plain text" ? langLabel.toLowerCase() : "";
+          text += "```" + lang + "\n";
           text += textBuilder(elem, "", false);
           text += "```\n";
           break;

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.0
+
+- コードブロックの言語指定に対応 (` ```sql `, ` ```java ` など)。`Plain text` は info string なしで出力
+
 ## 0.9.0
 
 - インラインコード (CODE) の Markdown 変換に対応 (`` `text` ``)

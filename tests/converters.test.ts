@@ -235,6 +235,24 @@ describe("textBuilder", () => {
     expect(textBuilder(div, "")).toBe("```\n1行目\n\n3行目\n```\n");
   });
 
+  it("B-09b: コードブロック 言語指定 Plain text → info string なし", () => {
+    const div = document.createElement("div");
+    div.innerHTML = `<div data-component-type="code_block"><div class="codeblock-topbar"><button class="languages-dropdown-button"><span class="menu-toggle">Plain text</span></button></div><div class="cm-content"><div class="cm-line">hello</div></div></div>`;
+    expect(textBuilder(div, "")).toBe("```\nhello\n```\n");
+  });
+
+  it("B-09c: コードブロック 言語指定 SQL → ```sql", () => {
+    const div = document.createElement("div");
+    div.innerHTML = `<div data-component-type="code_block"><div class="codeblock-topbar"><button class="languages-dropdown-button"><span class="menu-toggle">SQL</span></button></div><div class="cm-content"><div class="cm-line">select 1;</div></div></div>`;
+    expect(textBuilder(div, "")).toBe("```sql\nselect 1;\n```\n");
+  });
+
+  it("B-09d: コードブロック 言語指定 Java → ```java", () => {
+    const div = document.createElement("div");
+    div.innerHTML = `<div data-component-type="code_block"><div class="codeblock-topbar"><button class="languages-dropdown-button"><span class="menu-toggle">Java</span></button></div><div class="cm-content"><div class="cm-line">public static void main() {}</div></div></div>`;
+    expect(textBuilder(div, "")).toBe("```java\npublic static void main() {}\n```\n");
+  });
+
   it("B-10: UL in textBuilder", () => {
     const div = document.createElement("div");
     div.innerHTML = `<ul>${boxLi("項目")}</ul>`;
