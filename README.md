@@ -24,10 +24,9 @@ A Chrome extension (Manifest V3) that converts the body of a Box Notes document 
 
 This extension is not published to the Chrome Web Store. Load it as an unpacked extension:
 
-1. Clone this repository and build the extension:
+1. Clone this repository:
    ```bash
-   npm install
-   npm run compile
+   git clone https://github.com/manhole/chrome-boxnotes.git
    ```
 2. Open `chrome://extensions` in Chrome.
 3. Enable **Developer mode** (top right).
