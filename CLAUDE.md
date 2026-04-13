@@ -25,6 +25,16 @@ npm test           # Vitest でテストを実行
 npm run test:watch # ウォッチモードで実行
 ```
 
+## コミットワークフロー
+
+`src/` 以下を変更したときは、コミット前に必ず `npm run build` を実行し、生成された `dist/content-script.js` もコミットに含めること。Chrome 拡張は `dist/` を直接読み込むため、ソースとビルド成果物が一致していないと動作しない。
+
+手順:
+
+1. `npm run build` を実行 (compile → lint → format)
+2. `npm test` でテストが通ることを確認
+3. `dist/content-script.js` を `git add` してコミットに含める
+
 ## Architecture
 
 ソースは [src/](src/) 以下の2ファイル。型チェックは `tsc`、バンドルは `esbuild` が行い [dist/content-script.js](dist/content-script.js) として単一ファイルに出力される。
