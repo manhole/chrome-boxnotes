@@ -186,7 +186,7 @@
             break;
           }
           const cellContentBuilder = (td) => {
-            const pChildren = Array.from(td.children).filter((c) => c.tagName === 'P');
+            const pChildren = Array.from(td.querySelectorAll('p'));
             if (pChildren.length === 0) {
               return textContentBuilder(td);
             }
@@ -216,7 +216,7 @@
             let gridCol = 0;
             for (const tdChild of tr.children) {
               const td = tdChild;
-              if (td.tagName !== 'TD') {
+              if (td.tagName !== 'TD' && td.tagName !== 'TH') {
                 continue;
               }
               while (occupiedCols.has(gridCol)) {

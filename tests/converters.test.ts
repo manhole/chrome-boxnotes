@@ -328,6 +328,29 @@ describe("textBuilder", () => {
     expect(textBuilder(div, "")).toBe("| A | B |\n" + "| --- | --- |\n");
   });
 
+  it("B-12c: 1行目が TH (行見出し設定) → TH の内容も GFM テーブルに出力される", () => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <table>
+        <colgroup><col><col><col></colgroup>
+        <tbody>
+          <tr>
+            <th><div class="align-center"><p><span data-author-id="209800292">h-1 見出し</span></p></div></th>
+            <th><div class="align-center"><p><span data-author-id="209800292">h-2 見出し</span></p></div></th>
+            <th><div class="align-center"><p><span data-author-id="209800292">h-3 見出し</span></p></div></th>
+          </tr>
+          <tr>
+            <td><p><span data-author-id="209800292">1-1</span></p></td>
+            <td><p><span data-author-id="209800292">1-2</span></p></td>
+            <td><p><span data-author-id="209800292">1-3</span></p></td>
+          </tr>
+        </tbody>
+      </table>`;
+    expect(textBuilder(div, "")).toBe(
+      "| h-1 見出し | h-2 見出し | h-3 見出し |\n" + "| --- | --- | --- |\n" + "| 1-1 | 1-2 | 1-3 |\n",
+    );
+  });
+
   it("B-13: BUTTON → 無視", () => {
     const div = document.createElement("div");
     div.innerHTML = `<button>click</button>`;

@@ -205,7 +205,7 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlo
         }
         // TD 専用テキスト化: 直接の子が P の場合は <br> で連結、それ以外は textContentBuilder に委譲
         const cellContentBuilder = (td: HTMLTableCellElement): string => {
-          const pChildren = Array.from(td.children).filter((c) => c.tagName === "P");
+          const pChildren = Array.from(td.querySelectorAll("p"));
           if (pChildren.length === 0) {
             return textContentBuilder(td);
           }
@@ -236,11 +236,11 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlo
               }
             }
           }
-          // Phase 2: TD を走査してグリッドに配置
+          // Phase 2: TD/TH を走査してグリッドに配置 (TH は「行見出しを設定」時に生成される)
           let gridCol = 0;
           for (const tdChild of tr.children) {
             const td = tdChild as HTMLTableCellElement;
-            if (td.tagName !== "TD") {
+            if (td.tagName !== "TD" && td.tagName !== "TH") {
               continue;
             }
             // pending が占有している列をスキップ
