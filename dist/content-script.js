@@ -280,37 +280,35 @@
       link.remove();
       URL.revokeObjectURL(url);
     };
-    const appendSeparator = () => {
-      const separator = document.createElement('li');
-      separator.classList.add('separator');
-      menuElem.appendChild(separator);
-    };
-    appendSeparator();
-    {
-      const button = document.createElement('button');
-      button.title = 'Download body';
-      button.addEventListener('click', async () => {
-        const contentElem = document.querySelector('.pad:not(.hidden) .content-container');
-        const text = textBuilder(contentElem, '');
-        const title = document.querySelector('.pad:not(.hidden) .document-title');
-        const titleText = title.textContent + '.md';
-        downloadText(text, titleText);
-      });
-      const img = document.createElement('img');
-      img.src = chrome.runtime.getURL('images/download.svg');
-      img.style.cssText = 'width: 80%; height: 80%;';
-      const span = document.createElement('span');
-      span.classList.add('buttonicon');
-      span.classList.add('buttonicon-svg');
-      const li = document.createElement('li');
-      span.appendChild(img);
-      button.appendChild(span);
-      li.appendChild(button);
-      menuElem.appendChild(li);
+    const button = document.createElement('button');
+    button.className =
+      'bp_icon_button_module_iconButton--a2d49 bp_icon_button_module_default--a2d49 bp_icon_button_module_small--a2d49 magnifyIcon';
+    button.setAttribute('data-modern', 'false');
+    button.type = 'button';
+    button.title = 'Download as Markdown';
+    button.addEventListener('click', async () => {
+      const contentElem = document.querySelector('.pad:not(.hidden) .content-container');
+      const text = textBuilder(contentElem, '');
+      const title = document.querySelector('.pad:not(.hidden) .document-title');
+      const titleText = title.textContent + '.md';
+      downloadText(text, titleText);
+    });
+    const img = document.createElement('img');
+    img.src = chrome.runtime.getURL('images/download.svg');
+    img.style.cssText = 'width: 1.5rem; height: 1.5rem;';
+    button.appendChild(img);
+    const existingSeparator = menuElem.querySelector('li:empty');
+    const separator = document.createElement('li');
+    if (existingSeparator) {
+      separator.className = existingSeparator.className;
     }
+    const li = document.createElement('li');
+    li.appendChild(button);
+    const insertMediaLi = menuElem.querySelector("li:has(button[data-testid='insert-media'])");
+    insertMediaLi?.after(separator, li);
   };
   var observer = new MutationObserver(() => {
-    const menuElem = document.querySelector('ul.menu_left');
+    const menuElem = document.querySelector("ul[role='toolbar']");
     if (menuElem) {
       observer.disconnect();
       mainScript(menuElem);
