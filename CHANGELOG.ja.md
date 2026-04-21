@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.0
+
+- テーブルの行見出し (TH セル) に対応 — 「行見出しを設定」した行が Markdown に正しく出力されるようになった
+
 ## 0.11.0
 
 - Box Notes のツールバー DOM 変更に対応 (セレクタを `ul.menu_left` から `ul[role='toolbar']` に変更)

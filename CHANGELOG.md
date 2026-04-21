@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.0
+
+- Added support for row header cells (TH) in tables — table rows marked as "Row header" are now correctly exported to Markdown
+
 ## 0.11.0
 
 - Adapted to Box Notes toolbar DOM changes (selector changed from `ul.menu_left` to `ul[role='toolbar']`)
