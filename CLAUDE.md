@@ -27,6 +27,17 @@ npm test           # Vitest でテストを実行
 npm run test:watch # ウォッチモードで実行
 ```
 
+## 開発方針
+
+### TDD
+
+新機能・バグ修正は TDD で進める。
+
+1. 失敗するテストを書く (`npm test` で失敗することを確認)
+2. テストが通る最小限の実装をする
+3. `npm test` で全テストが通ることを確認
+4. `npm run build` でビルドして完了
+
 ## コミットワークフロー
 
 `src/` 以下を変更したときは、コミット前に必ず `npm run build` を実行し、生成された `dist/content-script.js` もコミットに含めること。Chrome 拡張は `dist/` を直接読み込むため、ソースとビルド成果物が一致していないと動作しない。
@@ -188,4 +199,19 @@ LI 内部は `SPAN.check-list-item-checkbox-container` (チェックボックス
 </div>
 ```
 
-`<thead>` / `<th>` は存在せず、全セルが `<tbody>` 内の `<td>`。`.content-container` の直接の子は `DIV.table-wrapper` であり、TABLE 要素が直接来ることはない。`textBuilder` の DIV 再帰処理を経由して TABLE ケースに到達する。
+通常は `<thead>` / `<th>` は存在せず、全セルが `<tbody>` 内の `<td>`。ただし「行見出しを設定」すると1行目のセルが `<th>` になる (下記参照)。`.content-container` の直接の子は `DIV.table-wrapper` であり、TABLE 要素が直接来ることはない。`textBuilder` の DIV 再帰処理を経由して TABLE ケースに到達する。
+
+「行見出しを設定」した場合の構造:
+
+```html
+<tbody>
+  <tr>
+    <th><div class="align-center"><p><span data-author-id="...">見出し</span></p></div></th>
+  </tr>
+  <tr>
+    <td><p><span data-author-id="...">セル</span></p></td>
+  </tr>
+</tbody>
+```
+
+`<th>` の直下は `<div class="align-center">` であり、`<p>` は孫要素になる点に注意。
