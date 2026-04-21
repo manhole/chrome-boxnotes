@@ -11,7 +11,7 @@ Box Notes の編集画面で本文を Markdown に変換してダウンロード
 バージョン番号は [dist/manifest.json](dist/manifest.json) の `version` フィールドで管理する。
 `package.json` の `version` は使用しないため、常に `0.0.0` のままにしておく。
 
-バージョンを上げるときは、[CHANGELOG.md](CHANGELOG.md) に該当バージョンのエントリを追加してから、バージョン番号と changelog をまとめて1つのコミットにすること。
+バージョンを上げるときは、[CHANGELOG.md](CHANGELOG.md) と [CHANGELOG.ja.md](CHANGELOG.ja.md) の両方に該当バージョンのエントリを追加してから、バージョン番号と changelog をまとめて1つのコミットにすること。
 
 ## Commands
 

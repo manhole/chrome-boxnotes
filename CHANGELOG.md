@@ -2,90 +2,90 @@
 
 ## 0.11.0
 
-- Box Notes のツールバー DOM 変更に対応 (セレクタを `ul.menu_left` から `ul[role='toolbar']` に変更)
-- ダウンロードボタンの配置を「画像またはファイルを挿入」ボタンの右隣に変更
-- ダウンロードアイコンをツールバーの既存ボタンと統一感のあるアウトラインスタイルに変更
+- Adapted to Box Notes toolbar DOM changes (selector changed from `ul.menu_left` to `ul[role='toolbar']`)
+- Moved download button to the right of the "Insert image or file" button
+- Updated download icon to an outline style matching existing toolbar buttons
 
 ## 0.10.1
 
-- コードブロックの言語ラベルを info string に正規化 (例: `Plain Text` → info string なし)
+- Normalized code block language labels into info strings (e.g. `Plain Text` → no info string)
 
 ## 0.10.0
 
-- コードブロックの言語指定に対応 (` ```sql `, ` ```java ` など)。`Plain text` は info string なしで出力
+- Added support for code block language info strings (e.g. ` ```sql `, ` ```java `). `Plain text` is output without an info string
 
 ## 0.9.0
 
-- インラインコード (CODE) の Markdown 変換に対応 (`` `text` ``)
+- Added support for inline code (CODE) conversion to Markdown (`` `text` ``)
 
 ## 0.8.0
 
-- 異種ブロック要素間 (見出し、リスト、引用、コードブロック、テーブル、HR) に空行を挿入し、CommonMark 互換性を向上
-- 同種ブロック間 (P-P) や BLOCKQUOTE・コードブロック内部では空行を挿入しない
+- Insert blank lines between different block elements (headings, lists, blockquotes, code blocks, tables, HR) for CommonMark compatibility
+- No blank lines between same-kind blocks (P-P) or inside BLOCKQUOTE / code blocks
 
 ## 0.7.0
 
-- イタリック (EM) の Markdown 変換に対応 (`*text*`)
-- 取り消し線 (S) の Markdown 変換に対応 (`~~text~~`)
+- Added support for italic (EM) conversion to Markdown (`*text*`)
+- Added support for strikethrough (S) conversion to Markdown (`~~text~~`)
 
 ## 0.6.0
 
-- テーブルの `colspan` / `rowspan` に対応。結合セルの後続列・後続行を空セルで補完して列数を揃える
-- セル内複数行テキストを `<br>` で区切って出力
+- Added support for `colspan` and `rowspan` in tables. Merged cells are padded with empty cells to maintain column count
+- Multiple paragraphs within a cell are joined with `<br>`
 
 ## 0.5.0
 
-- テーブルの GFM テーブル形式での出力に対応 (1行目をヘッダーとして扱う。`colspan` / `rowspan` は未対応)
+- Added support for GFM table output (first row treated as header; `colspan` / `rowspan` not yet supported)
 
 ## 0.4.1
 
-- コードブロック内の空行が 2 行になるバグを修正
+- Fixed a bug where blank lines inside code blocks were emitted as two newlines
 
 ## 0.4.0
 
-- メニュー検出を MutationObserver に変更し、ページ読み込みタイミングの変化に対応
+- Changed menu detection to use MutationObserver to handle changes in page load timing
 
 ## 0.3.0
 
-- HR (水平線) の Markdown 出力に対応
-- TypeScript 化、ESLint・Prettier 導入などの開発環境整備
+- Added support for HR (horizontal rule) Markdown output
+- Development tooling: TypeScript, ESLint, Prettier
 
 ## 0.2.8
 
-- OL (番号付きリスト) の Markdown 出力に対応
+- Added support for OL (ordered list) Markdown output
 
 ## 0.2.7
 
-- ダウンロードファイル名をページタイトルから取得するように変更
+- Changed download file name to use the document title
 
 ## 0.2.6
 
-- リンク表記の Markdown 出力に対応
+- Added support for link (A) Markdown output
 
 ## 0.2.5
 
-- 空行が不足する場合がある問題を修正
+- Fixed missing blank lines in some cases
 
 ## 0.2.4
 
-- 太字 (BOLD) の Markdown 出力に対応
+- Added support for bold (STRONG) Markdown output
 
 ## 0.2.3
 
-- 複数の Box Notes タブを遷移した際に、表示中のノートを正しく対象にするよう修正
+- Fixed an issue where the wrong note was targeted when multiple Box Notes tabs were open
 
 ## 0.2.2
 
-- 内部改善: スコープ外の変数への参照を除去
+- Internal improvement: removed references to variables outside scope
 
 ## 0.2.1
 
-- コラボレーターのカーソル名称がテキストに含まれないよう除外
+- Excluded collaborator cursor names from text output
 
 ## 0.2.0
 
-- チェックボックスの Markdown 出力に対応
+- Added support for checklist items as Markdown ([ ] / [x])
 
 ## 0.1.0
 
-- Box Notes 本文を Markdown に変換してダウンロードする機能を追加
+- Initial release: convert Box Notes body to Markdown and download
