@@ -9,7 +9,9 @@ const LANG_INFO_STRING_MAP: Record<string, string> = {
 };
 
 const toInfoString = (langLabel: string): string => {
-  if (!langLabel || langLabel === "Plain text") return "";
+  if (!langLabel || langLabel === "Plain text") {
+    return "";
+  }
   const key = langLabel.toLowerCase();
   return LANG_INFO_STRING_MAP[key] ?? key;
 };
@@ -198,7 +200,9 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlo
       }
       case "TABLE": {
         const tbody = elem.querySelector("tbody");
-        if (!tbody) break;
+        if (!tbody) {
+          break;
+        }
         // TD 専用テキスト化: 直接の子が P の場合は <br> で連結、それ以外は textContentBuilder に委譲
         const cellContentBuilder = (td: HTMLTableCellElement): string => {
           const pChildren = Array.from(td.children).filter((c) => c.tagName === "P");
@@ -213,7 +217,9 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlo
         const grid: string[][] = [];
         for (const trChild of tbody.children) {
           const tr = trChild as HTMLElement;
-          if (tr.tagName !== "TR") continue;
+          if (tr.tagName !== "TR") {
+            continue;
+          }
           const rowIndex = grid.length;
           grid.push([]);
           // Phase 1: pending セルを現在行に書き込み、remaining を -1 する
@@ -234,7 +240,9 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlo
           let gridCol = 0;
           for (const tdChild of tr.children) {
             const td = tdChild as HTMLTableCellElement;
-            if (td.tagName !== "TD") continue;
+            if (td.tagName !== "TD") {
+              continue;
+            }
             // pending が占有している列をスキップ
             while (occupiedCols.has(gridCol)) {
               gridCol++;
@@ -255,7 +263,9 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlo
             gridCol += colspan;
           }
         }
-        if (grid.length === 0) break;
+        if (grid.length === 0) {
+          break;
+        }
         const colCount = Math.max(...grid.map((r) => r.length));
         const rows = grid.map((row) => Array.from({ length: colCount }, (_, i) => row[i] ?? ""));
         const toRow = (cells: string[]) => "| " + cells.map((c) => c || " ").join(" | ") + " |";

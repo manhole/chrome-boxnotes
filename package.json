@@ -5,7 +5,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint src",
+    "lint": "eslint --fix src",
     "format": "prettier --write **/*.{ts,js}",
     "compile": "tsc -p tsconfig.build.json --noEmit && esbuild src/content-script.ts --bundle --outfile=dist/content-script.js --platform=browser --target=es2020",
     "build": "run-s compile lint format"

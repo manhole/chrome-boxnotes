@@ -7,7 +7,9 @@
     'c#': 'csharp',
   };
   var toInfoString = (langLabel) => {
-    if (!langLabel || langLabel === 'Plain text') return '';
+    if (!langLabel || langLabel === 'Plain text') {
+      return '';
+    }
     const key = langLabel.toLowerCase();
     return LANG_INFO_STRING_MAP[key] ?? key;
   };
@@ -180,7 +182,9 @@
         }
         case 'TABLE': {
           const tbody = elem.querySelector('tbody');
-          if (!tbody) break;
+          if (!tbody) {
+            break;
+          }
           const cellContentBuilder = (td) => {
             const pChildren = Array.from(td.children).filter((c) => c.tagName === 'P');
             if (pChildren.length === 0) {
@@ -192,7 +196,9 @@
           const grid = [];
           for (const trChild of tbody.children) {
             const tr = trChild;
-            if (tr.tagName !== 'TR') continue;
+            if (tr.tagName !== 'TR') {
+              continue;
+            }
             const rowIndex = grid.length;
             grid.push([]);
             const occupiedCols = /* @__PURE__ */ new Set();
@@ -210,7 +216,9 @@
             let gridCol = 0;
             for (const tdChild of tr.children) {
               const td = tdChild;
-              if (td.tagName !== 'TD') continue;
+              if (td.tagName !== 'TD') {
+                continue;
+              }
               while (occupiedCols.has(gridCol)) {
                 gridCol++;
               }
@@ -228,7 +236,9 @@
               gridCol += colspan;
             }
           }
-          if (grid.length === 0) break;
+          if (grid.length === 0) {
+            break;
+          }
           const colCount = Math.max(...grid.map((r) => r.length));
           const rows = grid.map((row) => Array.from({ length: colCount }, (_, i) => row[i] ?? ''));
           const toRow = (cells) => '| ' + cells.map((c) => c || ' ').join(' | ') + ' |';
