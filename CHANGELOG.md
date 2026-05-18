@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.0
+
+- Adapted to Box Notes DOM changes: title now retrieved from `input[type=text]` value, active pad detected by `data-active-state="active"`
+
 ## 0.12.0
 
 - Added support for row header cells (TH) in tables — table rows marked as "Row header" are now correctly exported to Markdown

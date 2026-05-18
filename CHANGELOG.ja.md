@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.0
+
+- Box Notes の DOM 変更に対応: タイトルを `input[type=text]` の value から取得するよう変更、アクティブな pad の判定を `data-active-state="active"` 属性で行うよう変更
+
 ## 0.12.0
 
 - テーブルの行見出し (TH セル) に対応 — 「行見出しを設定」した行が Markdown に正しく出力されるようになった
