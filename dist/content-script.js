@@ -287,10 +287,10 @@
     button.type = 'button';
     button.title = 'Download as Markdown';
     button.addEventListener('click', async () => {
-      const contentElem = document.querySelector('.pad:not(.hidden) .content-container');
+      const contentElem = document.querySelector(".pad[data-active-state='active'] .content-container");
       const text = textBuilder(contentElem, '');
-      const title = document.querySelector('.pad:not(.hidden) .document-title');
-      const titleText = title.textContent + '.md';
+      const titleInput = document.querySelector(".pad[data-active-state='active'] .editor-title-root input");
+      const titleText = titleInput.value + '.md';
       downloadText(text, titleText);
     });
     const img = document.createElement('img');

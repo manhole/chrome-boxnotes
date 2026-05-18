@@ -68,22 +68,45 @@ Chrome 拡張のファイル構成:
 1. `MutationObserver` で `ul.menu_left` の出現を監視し、見つかった時点で `observer.disconnect()` してから `mainScript()` を呼ぶ。
 2. `mainScript()` はメニューにセパレーターとダウンロードボタンを追加する。
 3. ボタンクリック時:
-   - `.pad:not(.hidden) .content-container` から本文 DOM を取得。
+   - `.pad[data-active-state='active'] .content-container` から本文 DOM を取得。
    - `textContentBuilder()` — インライン要素 (STRONG, EM, S, CODE, A, BR など) をテキストに変換する再帰関数。
    - `listBuilder()` — UL/OL/LI を Markdown リストに変換。ネスト深さをインデントで表現。
    - `textBuilder()` — ブロック要素 (P, H1-H3, BLOCKQUOTE, DIV[code_block], UL, OL, HR, TABLE) を走査してテキストを組み立てる再帰関数。第3引数 `separateBlocks` で異種ブロック間の空行挿入を制御 (BLOCKQUOTE・コードブロック内部では `false`)。
-   - `.pad:not(.hidden) .document-title` からファイル名を取得し `.md` として `Blob` ダウンロード。
+   - `.pad[data-active-state='active'] .editor-title-root input` の `value` からファイル名を取得し `.md` として `Blob` ダウンロード。
 
 ### 注意点
 
 - TABLE 要素は `tbody > tr > td` を走査し、GFM テーブル形式で出力する。1行目をヘッダーとして扱い区切り行を挿入。`.content-container` の直接の子は `DIV.table-wrapper` であり、既存の DIV 再帰処理を経由して TABLE ケースに到達する。`colspan` / `rowspan` は 2D グリッド展開で対応済み。結合セルの後続は空セルで補完する。セル内に複数 P がある場合は `<br>` で区切って連結する。
-- 複数の Box Notes タブを遷移すると `.pad` 要素が複数存在するため、`.pad:not(.hidden)` で現在表示中のものを選択している。
+- 複数の Box Notes タブを遷移すると `.pad` 要素が複数存在するため、`data-active-state="active"` 属性で現在表示中のものを選択している。
 - コードブロックは `div[data-component-type="code_block"]` 内の `div.cm-line` を行単位で取得する構造。
 - `collab-cursor-container` はコラボレーターのカーソル名称を含むため、テキスト変換時に除外している。
 
-## Box Notes の DOM 構造 (2026-04 時点)
+## Box Notes の DOM 構造 (2026-05 時点)
 
 Box Notes 側の DOM が変更されたときの確認用に記録する。
+
+### タイトル (2026-05 変更)
+
+タイトルは `input[type=text]` の `value` 属性から取得する。旧 `.document-title` クラスは廃止。
+
+```html
+<div class="pad" data-active-state="active">
+  <div class="pm-inner-container">
+    <div class="innerdocbody">
+      <div class="editor-title-root">
+        <div class="ClientEditorTitle-module__editor-title-slot--...">
+          <div class="...ClientEditorTitle-module__editor-title--...">
+            <input type="text" value="ドキュメントタイトル">
+          </div>
+        </div>
+      </div>
+      ...
+    </div>
+  </div>
+</div>
+```
+
+アクティブな `.pad` の判定は `data-active-state="active"` 属性で行う (旧: `.pad:not(.hidden)`)。
 
 ### テキスト・段落
 

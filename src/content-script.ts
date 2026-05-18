@@ -23,12 +23,14 @@ const mainScript = (menuElem: Element) => {
   button.type = "button";
   button.title = "Download as Markdown";
   button.addEventListener("click", async () => {
-    // 複数のBox Notesを遷移すると ".pad" 要素が複数になる。選択されているものは ".hidden" が付かない。
-    const contentElem = document.querySelector(".pad:not(.hidden) .content-container") as HTMLElement;
+    // 複数のBox Notesを遷移すると ".pad" 要素が複数になる。アクティブなものは data-active-state="active"。
+    const contentElem = document.querySelector(".pad[data-active-state='active'] .content-container") as HTMLElement;
     const text = textBuilder(contentElem!, "");
 
-    const title = document.querySelector(".pad:not(.hidden) .document-title")!;
-    const titleText = title.textContent + ".md";
+    const titleInput = document.querySelector<HTMLInputElement>(
+      ".pad[data-active-state='active'] .editor-title-root input",
+    )!;
+    const titleText = titleInput.value + ".md";
     downloadText(text, titleText);
   });
 
