@@ -6,8 +6,9 @@
     'c++': 'cpp',
     'c#': 'csharp',
   };
+  var PLAIN_TEXT_LABELS = /* @__PURE__ */ new Set(['Plain text', '\u30D7\u30EC\u30FC\u30F3\u30C6\u30AD\u30B9\u30C8']);
   var toInfoString = (langLabel) => {
-    if (!langLabel || langLabel === 'Plain text') {
+    if (!langLabel || PLAIN_TEXT_LABELS.has(langLabel)) {
       return '';
     }
     const key = langLabel.toLowerCase();
@@ -152,8 +153,11 @@
             text += (line === '\n' ? '' : line) + '\n';
             break;
           }
-          if (elem.dataset.componentType === 'code_block') {
-            const langLabel = elem.querySelector('.languages-dropdown-button .menu-toggle')?.textContent?.trim() ?? '';
+          if (elem.dataset.componentType === 'code_block' || elem.classList.contains('codeblock-container-card')) {
+            const langLabel =
+              elem.querySelector('[data-testid="code-block-languages-dropdown-button"]')?.textContent?.trim() ??
+              elem.querySelector('.languages-dropdown-button .menu-toggle')?.textContent?.trim() ??
+              '';
             const lang = toInfoString(langLabel);
             text += '```' + lang + '\n';
             text += textBuilder(elem, '', false);

@@ -8,8 +8,11 @@ const LANG_INFO_STRING_MAP: Record<string, string> = {
   "c#": "csharp",
 };
 
+// 「プレーンテキスト」は UI 言語によってローカライズされるため、既知の表記を info string なしとして扱う
+const PLAIN_TEXT_LABELS = new Set(["Plain text", "プレーンテキスト"]);
+
 const toInfoString = (langLabel: string): string => {
-  if (!langLabel || langLabel === "Plain text") {
+  if (!langLabel || PLAIN_TEXT_LABELS.has(langLabel)) {
     return "";
   }
   const key = langLabel.toLowerCase();
@@ -167,11 +170,15 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlo
           break;
         }
         // コードブロック
-        if (elem.dataset.componentType === "code_block") {
-          // codeblock-topbar の languages-dropdown-button から言語名を取得し info string に正規化する。
-          // "Plain text" は言語指定なし。それ以外は一般的な Markdown info string へマッピングする
+        // 2026-08 以降は codeblock-container-card クラス、それ以前は data-component-type="code_block"
+        if (elem.dataset.componentType === "code_block" || elem.classList.contains("codeblock-container-card")) {
+          // codeblock-topbar の言語ボタンから言語名を取得し info string に正規化する。
+          // プレーンテキストは言語指定なし。それ以外は一般的な Markdown info string へマッピングする
           // (Linguist / highlight.js 互換)。マップにないものはフォールバックで小文字化する。
-          const langLabel = elem.querySelector(".languages-dropdown-button .menu-toggle")?.textContent?.trim() ?? "";
+          const langLabel =
+            elem.querySelector('[data-testid="code-block-languages-dropdown-button"]')?.textContent?.trim() ??
+            elem.querySelector(".languages-dropdown-button .menu-toggle")?.textContent?.trim() ??
+            "";
           const lang = toInfoString(langLabel);
           text += "```" + lang + "\n";
           text += textBuilder(elem, "", false);

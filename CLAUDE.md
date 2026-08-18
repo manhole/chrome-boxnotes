@@ -71,14 +71,14 @@ Chrome 拡張のファイル構成:
    - `.pad[data-active-state='active'] .content-container` から本文 DOM を取得。
    - `textContentBuilder()` — インライン要素 (STRONG, EM, S, CODE, A, BR など) をテキストに変換する再帰関数。
    - `listBuilder()` — UL/OL/LI を Markdown リストに変換。ネスト深さをインデントで表現。
-   - `textBuilder()` — ブロック要素 (P, H1-H3, BLOCKQUOTE, DIV[code_block], UL, OL, HR, TABLE) を走査してテキストを組み立てる再帰関数。第3引数 `separateBlocks` で異種ブロック間の空行挿入を制御 (BLOCKQUOTE・コードブロック内部では `false`)。
+   - `textBuilder()` — ブロック要素 (P, H1-H3, BLOCKQUOTE, コードブロック DIV, UL, OL, HR, TABLE) を走査してテキストを組み立てる再帰関数。第3引数 `separateBlocks` で異種ブロック間の空行挿入を制御 (BLOCKQUOTE・コードブロック内部では `false`)。
    - `.pad[data-active-state='active'] .editor-title-root input` の `value` からファイル名を取得し `.md` として `Blob` ダウンロード。
 
 ### 注意点
 
 - TABLE 要素は `tbody > tr > td` を走査し、GFM テーブル形式で出力する。1行目をヘッダーとして扱い区切り行を挿入。`.content-container` の直接の子は `DIV.table-wrapper` であり、既存の DIV 再帰処理を経由して TABLE ケースに到達する。`colspan` / `rowspan` は 2D グリッド展開で対応済み。結合セルの後続は空セルで補完する。セル内に複数 P がある場合は `<br>` で区切って連結する。
 - 複数の Box Notes タブを遷移すると `.pad` 要素が複数存在するため、`data-active-state="active"` 属性で現在表示中のものを選択している。
-- コードブロックは `div[data-component-type="code_block"]` 内の `div.cm-line` を行単位で取得する構造。
+- コードブロックは `div.codeblock-container-card` (旧: `div[data-component-type="code_block"]`) 内の `div.cm-line` を行単位で取得する構造。旧構造の検出も後方互換のため残している。
 - `collab-cursor-container` はコラボレーターのカーソル名称を含むため、テキスト変換時に除外している。
 
 ## Box Notes の DOM 構造 (2026-05 時点)
@@ -168,23 +168,34 @@ LI の **兄弟要素** として子 UL/OL が並ぶ構造 (LI の子ではな�
 
 LI 内部は `SPAN.check-list-item-checkbox-container` (チェックボックス UI) と `SPAN.list-item-content > P` (テキスト) の2要素。`is-checked` クラスの有無で判定する。
 
-### コードブロック
+### コードブロック (2026-08 変更)
+
+`data-component-type="code_block"` 属性は廃止された。コードブロックの検出は `div.codeblock-container-card` クラスで行う (`data-testid="codeblock-container-card"` も付く)。
 
 ```html
-<div data-component-type="code_block" class="react-node-view ...">
-  <div class="codeblock-container">
-    <div role="none">
-      <div class="codeblock-topbar"> ... </div>  <!-- 言語選択・"..."ボタン -->
-      <div class="codemirror-wrapper">
-        <div class="cm-editor">
-          <div class="cm-scroller">
-            <div class="cm-gutters"> ... </div>  <!-- 行番号 -->
-            <div class="cm-content">
-              <div class="cm-line">コード1行目</div>
-              <div class="cm-line"><br></div>     <!-- 空行 -->
-              <div class="cm-line">コード3行目</div>
-            </div>
+<div class="react-node-view" contenteditable="false">
+  <div data-testid="codeblock-container-card" data-codeblock-expand="open"
+       class="bp_card_module_card--... codeblock-container-card" data-modern="true">
+    <div class="codeblock-topbar">
+      <div class="code-block-language-menu-combobox">
+        <button data-testid="code-block-languages-dropdown-button" type="button">
+          <span class="">プレーンテキスト</span>  <!-- 言語名 -->
+          <span class="..."><svg>...</svg></span>  <!-- ドロップダウン矢印アイコン -->
+        </button>
+      </div>
+      <div class="codeblock-topbar__actions"> ... </div>  <!-- コピー・"..."ボタン -->
+    </div>
+    <div data-testid="codemirror-wrapper" class="codeblock-codemirror-wrapper">
+      <div class="cm-editor">
+        <div class="cm-announced"></div>
+        <div class="cm-scroller">
+          <div class="cm-gutters"> ... </div>  <!-- 行番号 (cm-gutterElement) -->
+          <div class="cm-content">
+            <div class="cm-line">コード1行目</div>
+            <div class="cm-line"><br></div>     <!-- 空行 -->
+            <div class="cm-line">コード3行目</div>
           </div>
+          <div class="cm-layer ..."> ... </div>  <!-- カーソルレイヤー -->
         </div>
       </div>
     </div>
@@ -194,7 +205,9 @@ LI 内部は `SPAN.check-list-item-checkbox-container` (チェックボックス
 
 空行は `<div class="cm-line"><br></div>`。`<br>` が `textContentBuilder` で `"\n"` になるため、cm-line 処理では `line === "\n"` のとき `""` として扱う (そうしないと改行が2行分になる)。
 
-言語名は `.codeblock-topbar .languages-dropdown-button .menu-toggle` の textContent から取得する (例: `"Plain text"`, `"SQL"`, `"Java"`)。`"Plain text"` は info string なしとして扱い、それ以外は小文字化して `` ```sql ``, `` ```java `` のように出力する。
+言語名は `button[data-testid="code-block-languages-dropdown-button"]` の textContent から取得する (旧: `.languages-dropdown-button .menu-toggle`)。プレーンテキストの表示名は UI 言語でローカライズされる (日本語 UI では `"プレーンテキスト"`、英語 UI では `"Plain text"`) ため、既知の表記を `PLAIN_TEXT_LABELS` に列挙して info string なしとして扱う。それ以外の言語名 (`"SQL"`, `"Java"`, `"C++"` など) はローカライズされず、小文字化 + `LANG_INFO_STRING_MAP` の変換で `` ```sql ``, `` ```java ``, `` ```cpp `` のように出力する。
+
+`data-codeblock-expand` 属性が追加されており、コードブロックに折りたたみ状態が存在する可能性がある (折りたたみ時の DOM は未確認)。
 
 ### BLOCKQUOTE
 

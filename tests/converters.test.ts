@@ -19,6 +19,28 @@ const checkLi = (text: string, checked: boolean): string => {
   return `<li class="${cls}"><span class="check-list-item-checkbox-container" contenteditable="false"><input class="check-list-item-checkbox-input" type="checkbox"${checked ? ' checked="true"' : ""}><span class="check-list-item-checkbox"></span></span><span class="list-item-content"><p><span data-author-id="123">${text}</span></p></span></li>`;
 };
 
+// 2026-08 時点のコードブロック実構造。data-component-type="code_block" は廃止され、
+// codeblock-container-card クラスが目印になった。言語ボタン・topbar のボタン群・
+// 行番号ガター・カーソルレイヤーを含む (これらのテキストが出力に混入しないことも検証対象)。
+const codeBlock202608 = (langLabel: string, linesHtml: string): string =>
+  `<div class="react-node-view" contenteditable="false">` +
+  `<div data-testid="codeblock-container-card" data-codeblock-expand="open" class="bp_card_module_card--65268 codeblock-container-card" data-modern="true">` +
+  `<div class="codeblock-topbar">` +
+  `<div class="code-block-language-menu-combobox">` +
+  `<button data-testid="code-block-languages-dropdown-button" type="button">` +
+  `<span class="">${langLabel}</span>` +
+  `<span class="bp_base_button_module_icon--e3ebe"><svg viewBox="0 0 24 24" role="presentation"><path d=""></path></svg></span>` +
+  `</button>` +
+  `</div>` +
+  `<div class="codeblock-topbar__actions"><button aria-label="コードをコピー" type="button"></button><button aria-label="その他のオプション" type="button"></button></div>` +
+  `</div>` +
+  `<div data-testid="codemirror-wrapper" class="codeblock-codemirror-wrapper">` +
+  `<div class="cm-editor"><div class="cm-announced"></div><div tabindex="-1" class="cm-scroller">` +
+  `<div class="cm-gutters cm-gutters-before" aria-hidden="true"><div class="cm-gutter cm-lineNumbers"><div class="cm-gutterElement">1</div><div class="cm-gutterElement">2</div><div class="cm-gutterElement">3</div></div></div>` +
+  `<div class="cm-content">${linesHtml}</div>` +
+  `<div class="cm-layer cm-cursorLayer" aria-hidden="true"><div class="cm-cursor cm-cursor-primary"></div></div>` +
+  `</div></div></div></div></div>`;
+
 // -------------------------------------------------------------------
 // textContentBuilder
 // -------------------------------------------------------------------
@@ -268,6 +290,27 @@ describe("textBuilder", () => {
   it("B-09g: コードブロック 言語指定 C# → ```csharp", () => {
     const div = document.createElement("div");
     div.innerHTML = `<div data-component-type="code_block"><div class="codeblock-topbar"><button class="languages-dropdown-button"><span class="menu-toggle">C#</span></button></div><div class="cm-content"><div class="cm-line">// C#</div></div></div>`;
+    expect(textBuilder(div, "")).toBe("```csharp\n// C#\n```\n");
+  });
+
+  it("B-09h: コードブロック 2026-08 構造 プレーンテキスト → fence あり・info string なし・UI テキスト混入なし", () => {
+    const div = document.createElement("div");
+    div.innerHTML = codeBlock202608(
+      "プレーンテキスト",
+      `<div class="cm-line">コードブロック1行目</div><div class="cm-line"><br></div><div class="cm-line">コードブロック3行目</div>`,
+    );
+    expect(textBuilder(div, "")).toBe("```\nコードブロック1行目\n\nコードブロック3行目\n```\n");
+  });
+
+  it("B-09i: コードブロック 2026-08 構造 言語指定 Java → ```java", () => {
+    const div = document.createElement("div");
+    div.innerHTML = codeBlock202608("Java", `<div class="cm-line">public static void main() {}</div>`);
+    expect(textBuilder(div, "")).toBe("```java\npublic static void main() {}\n```\n");
+  });
+
+  it("B-09j: コードブロック 2026-08 構造 言語指定 C# → ```csharp", () => {
+    const div = document.createElement("div");
+    div.innerHTML = codeBlock202608("C#", `<div class="cm-line">// C#</div>`);
     expect(textBuilder(div, "")).toBe("```csharp\n// C#\n```\n");
   });
 
