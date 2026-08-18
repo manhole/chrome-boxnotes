@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.14.0
+
+- Adapted to Box Notes code block DOM changes: code blocks are now detected by the `codeblock-container-card` class (the `data-component-type="code_block"` attribute was removed), and the language label is read from the new dropdown button. The localized plain text label (e.g. `プレーンテキスト`) is treated as no info string
+
 ## 0.13.0
 
 - Adapted to Box Notes DOM changes: title now retrieved from `input[type=text]` value, active pad detected by `data-active-state="active"`

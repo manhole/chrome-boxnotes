@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.14.0
+
+- Box Notes のコードブロック DOM 変更に対応: コードブロックの検出を `codeblock-container-card` クラスで行うよう変更 (`data-component-type="code_block"` 属性は廃止)、言語名を新しいドロップダウンボタンから取得するよう変更。ローカライズされた「プレーンテキスト」表記も info string なしとして扱う
+
 ## 0.13.0
 
 - Box Notes の DOM 変更に対応: タイトルを `input[type=text]` の value から取得するよう変更、アクティブな pad の判定を `data-active-state="active"` 属性で行うよう変更
