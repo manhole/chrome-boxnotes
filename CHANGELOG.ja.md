@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.15.0
+
+- Box Notes のタイトル DOM 変更に対応: タイトルを `input[type=text]` ではなく、編集可能なタイトル欄 (`role="textbox"`) から取得するよう変更。ダウンロードが `TypeError` で失敗する問題を修正
+- タイトルが取得できない・空のときは、失敗させずに `untitled.md` としてダウンロードするよう変更
+
 ## 0.14.0
 
 - Box Notes のコードブロック DOM 変更に対応: コードブロックの検出を `codeblock-container-card` クラスで行うよう変更 (`data-component-type="code_block"` 属性は廃止)、言語名を新しいドロップダウンボタンから取得するよう変更。ローカライズされた「プレーンテキスト」表記も info string なしとして扱う

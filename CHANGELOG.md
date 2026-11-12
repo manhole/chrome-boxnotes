@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.15.0
+
+- Adapted to Box Notes title DOM changes: the title is now read from the contenteditable title box (`role="textbox"`) instead of `input[type=text]`, which fixes the download failing with a `TypeError`
+- If the title cannot be found or is empty, the note is now downloaded as `untitled.md` instead of failing
+
 ## 0.14.0
 
 - Adapted to Box Notes code block DOM changes: code blocks are now detected by the `codeblock-container-card` class (the `data-component-type="code_block"` attribute was removed), and the language label is read from the new dropdown button. The localized plain text label (e.g. `プレーンテキスト`) is treated as no info string
