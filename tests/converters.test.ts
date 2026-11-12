@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { textContentBuilder, listBuilder, textBuilder } from "../src/converters";
+import { textContentBuilder, listBuilder, textBuilder, titleBuilder } from "../src/converters";
 
 // Box Notes の実際の DOM 構造に基づいてテスト用要素を組み立てるヘルパー
 const el = (html: string): HTMLElement => {
@@ -518,5 +518,53 @@ describe("組み合わせ", () => {
       `<ul>${boxLi("項目2")}</ul>`,
     ].join("");
     expect(textBuilder(div, "")).toBe("- 項目1\n\n- 項目2\n");
+  });
+});
+
+// -------------------------------------------------------------------
+// titleBuilder
+// -------------------------------------------------------------------
+describe("titleBuilder", () => {
+  // 2026-11 時点のタイトル実構造。input は廃止され、contenteditable な div (tiptap) になった。
+  // 保存場所を示すボタン (save-location-chip) が同じ .editor-title-root 内に並ぶ。
+  const pad202611 = (titleInnerHtml: string): HTMLElement =>
+    el(
+      `<div class="pad" data-active-state="active"><div class="pm-inner-container"><div class="innerdocbody">` +
+        `<div class="editor-title-root">` +
+        `<div class="ClientEditorTitle-module__editor-title-slot--Fc3EC" data-editor-title-slot="true">` +
+        `<div data-save-location="true"><button type="button" title="chrome-boxnotes" data-testid="save-location-chip" aria-label="保存場所: chrome-boxnotes"><span>chrome-boxnotes</span></button></div>` +
+        `<div class="EditorTitle-module__editor-title--iVK2k"><div><div class="_editorContainer_jguz6_10"><div>` +
+        `<div contenteditable="true" role="textbox" aria-multiline="false" aria-label="タイトルを追加" translate="no" class="tiptap ProseMirror" tabindex="0">${titleInnerHtml}</div>` +
+        `</div></div></div></div>` +
+        `</div></div>` +
+        `<div class="editor-content-editable"><div class="ProseMirror content-container"><p><span data-author-id="1">本文</span></p></div></div>` +
+        `</div></div></div>`,
+    );
+
+  it("N-01: contenteditable なタイトル欄 (2026-11 構造) からタイトルを取得する", () => {
+    expect(titleBuilder(pad202611(`<p>case 1</p>`))).toBe("case 1");
+  });
+
+  it("N-02: 保存場所ボタンや本文のテキストはタイトルに混入しない", () => {
+    expect(titleBuilder(pad202611(`<p>case 2 (タイトル)</p>`))).toBe("case 2 (タイトル)");
+  });
+
+  it("N-03: タイトルが空のときは空文字を返す", () => {
+    expect(titleBuilder(pad202611(`<p><br class="ProseMirror-trailingBreak"></p>`))).toBe("");
+  });
+
+  it("N-04: 旧構造 (input の value) からもタイトルを取得する", () => {
+    const pad = el(
+      `<div class="pad" data-active-state="active"><div class="editor-title-root">` +
+        `<div class="ClientEditorTitle-module__editor-title-slot--x"><div class="ClientEditorTitle-module__editor-title--x">` +
+        `<input type="text" value="旧タイトル">` +
+        `</div></div></div></div>`,
+    );
+    expect(titleBuilder(pad)).toBe("旧タイトル");
+  });
+
+  it("N-05: タイトル欄が見つからないときは null を返す", () => {
+    const pad = el(`<div class="pad" data-active-state="active"><div class="editor-title-root"></div></div>`);
+    expect(titleBuilder(pad)).toBeNull();
   });
 });

@@ -303,3 +303,18 @@ export const textBuilder = (parentElem: HTMLElement, prefix: string, separateBlo
   }
   return text;
 };
+
+// .pad 要素からノートのタイトルを取得する。タイトル欄が見つからなければ null を返す。
+export const titleBuilder = (padElem: ParentNode): string | null => {
+  // 2026-11 以降: タイトル欄は contenteditable な div (role="textbox")。中身は <p>タイトル</p>。
+  const titleBox = padElem.querySelector(".editor-title-root [role='textbox']");
+  if (titleBox) {
+    return (titleBox.textContent ?? "").trim();
+  }
+  // 旧構造 (2026-05 〜): input[type=text] の value。後方互換のため残している。
+  const titleInput = padElem.querySelector<HTMLInputElement>(".editor-title-root input");
+  if (titleInput) {
+    return titleInput.value.trim();
+  }
+  return null;
+};

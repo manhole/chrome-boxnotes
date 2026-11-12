@@ -54,7 +54,7 @@ npm run test:watch # ウォッチモードで実行
 
 ソースは [src/](src/) 以下の2ファイル。型チェックは `tsc`、バンドルは `esbuild` が行い [dist/content-script.js](dist/content-script.js) として単一ファイルに出力される。
 
-- [src/converters.ts](src/converters.ts) — Markdown 変換の純粋関数 (`textContentBuilder` / `listBuilder` / `textBuilder`) をエクスポート。テスト対象。
+- [src/converters.ts](src/converters.ts) — Markdown 変換の純粋関数 (`textContentBuilder` / `listBuilder` / `textBuilder`) とタイトル取得関数 (`titleBuilder`) をエクスポート。テスト対象。
 - [src/content-script.ts](src/content-script.ts) — DOM 操作・MutationObserver・ボタン登録。`converters.ts` の関数を使う。
 
 Chrome 拡張のファイル構成:
@@ -72,7 +72,7 @@ Chrome 拡張のファイル構成:
    - `textContentBuilder()` — インライン要素 (STRONG, EM, S, CODE, A, BR など) をテキストに変換する再帰関数。
    - `listBuilder()` — UL/OL/LI を Markdown リストに変換。ネスト深さをインデントで表現。
    - `textBuilder()` — ブロック要素 (P, H1-H3, BLOCKQUOTE, コードブロック DIV, UL, OL, HR, TABLE) を走査してテキストを組み立てる再帰関数。第3引数 `separateBlocks` で異種ブロック間の空行挿入を制御 (BLOCKQUOTE・コードブロック内部では `false`)。
-   - `.pad[data-active-state='active'] .editor-title-root input` の `value` からファイル名を取得し `.md` として `Blob` ダウンロード。
+   - `titleBuilder()` — アクティブな `.pad` 内の `.editor-title-root [role='textbox']` の textContent からタイトルを取得し、`.md` を付けたファイル名で `Blob` ダウンロード。タイトル欄が見つからない・空のときは `untitled.md` にして本文のダウンロードは続ける。
 
 ### 注意点
 
@@ -81,30 +81,51 @@ Chrome 拡張のファイル構成:
 - コードブロックは `div.codeblock-container-card` (旧: `div[data-component-type="code_block"]`) 内の `div.cm-line` を行単位で取得する構造。旧構造の検出も後方互換のため残している。
 - `collab-cursor-container` はコラボレーターのカーソル名称を含むため、テキスト変換時に除外している。
 
-## Box Notes の DOM 構造 (2026-05 時点)
+## Box Notes の DOM 構造 (2026-11 時点)
 
 Box Notes 側の DOM が変更されたときの確認用に記録する。
 
-### タイトル (2026-05 変更)
+### タイトル (2026-11 変更)
 
-タイトルは `input[type=text]` の `value` 属性から取得する。旧 `.document-title` クラスは廃止。
+タイトルは `.editor-title-root` 内の `div[role="textbox"]` (contenteditable。tiptap / ProseMirror) の textContent から取得する。2026-05 〜 2026-11 の `input[type=text]` は廃止された (`titleBuilder` には後方互換のため検出を残している)。さらに前の `.document-title` クラスも廃止済み。
 
 ```html
 <div class="pad" data-active-state="active">
   <div class="pm-inner-container">
     <div class="innerdocbody">
       <div class="editor-title-root">
-        <div class="ClientEditorTitle-module__editor-title-slot--...">
-          <div class="...ClientEditorTitle-module__editor-title--...">
-            <input type="text" value="ドキュメントタイトル">
+        <div class="ClientEditorTitle-module__editor-title-slot--..." data-editor-title-slot="true">
+          <div data-save-location="true">
+            <!-- 保存場所 (フォルダ名) を示すボタン。タイトルではない -->
+            <button type="button" data-testid="save-location-chip" aria-label="保存場所: フォルダ名">
+              <span class="..."><svg>...</svg></span><span>フォルダ名</span>
+            </button>
+          </div>
+          <div class="EditorTitle-module__editor-title--...">
+            <div><div class="_editorContainer_..."><div>
+              <div contenteditable="true" role="textbox" aria-multiline="false"
+                   aria-label="タイトルを追加" translate="no" class="tiptap ProseMirror" tabindex="0">
+                <p>ドキュメントタイトル</p>
+              </div>
+            </div></div></div>
           </div>
         </div>
       </div>
-      ...
+      <div class="editor-portal-host"></div>
+      <div class="editor-content-editable ...">
+        <div class="ProseMirror ProseMirror-editable content-container"> ... </div>  <!-- 本文 -->
+      </div>
+      <div class="version-content hidden"></div>
+      <div class="hidden content-container version-content-status-container"></div>
     </div>
   </div>
 </div>
 ```
+
+- 同じ `.editor-title-root` 内に保存場所ボタンがあり、そのテキスト (フォルダ名) を拾わないよう `[role='textbox']` に絞っている。
+- 画面上は長いタイトルが CSS で省略表示されるが、textContent は全文を返す。
+- 複数のノートを遷移すると、非アクティブな `.pad` のタイトル欄も現在開いているノートのタイトルに書き換わる (本文は元のノートのまま)。タイトルは必ずアクティブな `.pad` から取得する。
+- `.pad` 内には `.content-container` が 2 つある (本文と、末尾の `version-content-status-container`)。`querySelector` は文書順で先頭の本文側を返す。
 
 アクティブな `.pad` の判定は `data-active-state="active"` 属性で行う (旧: `.pad:not(.hidden)`)。
 

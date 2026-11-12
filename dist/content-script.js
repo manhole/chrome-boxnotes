@@ -271,8 +271,20 @@
     }
     return text;
   };
+  var titleBuilder = (padElem) => {
+    const titleBox = padElem.querySelector(".editor-title-root [role='textbox']");
+    if (titleBox) {
+      return (titleBox.textContent ?? '').trim();
+    }
+    const titleInput = padElem.querySelector('.editor-title-root input');
+    if (titleInput) {
+      return titleInput.value.trim();
+    }
+    return null;
+  };
 
   // src/content-script.ts
+  var FALLBACK_TITLE = 'untitled';
   var mainScript = (menuElem) => {
     const downloadText = (text, fileName) => {
       const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
@@ -291,11 +303,18 @@
     button.type = 'button';
     button.title = 'Download as Markdown';
     button.addEventListener('click', async () => {
-      const contentElem = document.querySelector(".pad[data-active-state='active'] .content-container");
+      const padElem = document.querySelector(".pad[data-active-state='active']");
+      const contentElem = padElem?.querySelector('.content-container');
+      if (!padElem || !contentElem) {
+        console.error('[chrome-boxnotes] Note content not found. The Box Notes DOM may have changed.');
+        return;
+      }
       const text = textBuilder(contentElem, '');
-      const titleInput = document.querySelector(".pad[data-active-state='active'] .editor-title-root input");
-      const titleText = titleInput.value + '.md';
-      downloadText(text, titleText);
+      const title = titleBuilder(padElem);
+      if (title === null) {
+        console.warn('[chrome-boxnotes] Note title not found. The Box Notes DOM may have changed.');
+      }
+      downloadText(text, (title || FALLBACK_TITLE) + '.md');
     });
     const img = document.createElement('img');
     img.src = chrome.runtime.getURL('images/download.svg');

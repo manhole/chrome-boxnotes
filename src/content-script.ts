@@ -1,6 +1,9 @@
 "use strict";
 
-import { textBuilder } from "./converters";
+import { textBuilder, titleBuilder } from "./converters";
+
+// タイトルが取得できない・空のときに使うファイル名
+const FALLBACK_TITLE = "untitled";
 
 const mainScript = (menuElem: Element) => {
   const downloadText = (text: string, fileName: string) => {
@@ -24,14 +27,20 @@ const mainScript = (menuElem: Element) => {
   button.title = "Download as Markdown";
   button.addEventListener("click", async () => {
     // 複数のBox Notesを遷移すると ".pad" 要素が複数になる。アクティブなものは data-active-state="active"。
-    const contentElem = document.querySelector(".pad[data-active-state='active'] .content-container") as HTMLElement;
-    const text = textBuilder(contentElem!, "");
+    const padElem = document.querySelector(".pad[data-active-state='active']");
+    const contentElem = padElem?.querySelector<HTMLElement>(".content-container");
+    if (!padElem || !contentElem) {
+      console.error("[chrome-boxnotes] Note content not found. The Box Notes DOM may have changed.");
+      return;
+    }
+    const text = textBuilder(contentElem, "");
 
-    const titleInput = document.querySelector<HTMLInputElement>(
-      ".pad[data-active-state='active'] .editor-title-root input",
-    )!;
-    const titleText = titleInput.value + ".md";
-    downloadText(text, titleText);
+    // タイトルが取れなくても本文はダウンロードできるようにする (Box Notes 側の DOM 変更でタイトル欄だけ壊れることがある)
+    const title = titleBuilder(padElem);
+    if (title === null) {
+      console.warn("[chrome-boxnotes] Note title not found. The Box Notes DOM may have changed.");
+    }
+    downloadText(text, (title || FALLBACK_TITLE) + ".md");
   });
 
   const img = document.createElement("img");
